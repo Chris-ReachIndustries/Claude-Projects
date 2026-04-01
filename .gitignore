@@ -1,0 +1,33 @@
+node_modules/
+dist/
+web/dist/
+.claude/
+claudeadmin/
+*.db
+*.db-wal
+*.db-shm
+.env
+.DS_Store
+Thumbs.db
+*.log
+debug.log
+*.exe
+.playwright-mcp/
+certs/
+
+# Compiled binaries
+agent-cli
+server
+
+# Generated docs
+docs/output/
+
+# Agent session artifacts
+.agent-sessions/
+.agent-tasks.json
+.plans/
+
+# Build artifacts
+*.o
+tsconfig.tsbuildinfo
+tsconfig.node.tsbuildinfo
