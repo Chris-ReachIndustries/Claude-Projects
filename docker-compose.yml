@@ -1,6 +1,6 @@
 services:
   cam:
-    build: .
+    build: ./backend
     ports:
       - "9222:9222"
     volumes:

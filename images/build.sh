@@ -12,7 +12,7 @@ if [ $# -gt 0 ]; then IMAGES="$@"; else IMAGES="$ALL_IMAGES"; fi
 
 echo "=== Building agent-cli ==="
 MSYS_NO_PATHCONV=1 docker run --rm \
-  -v "$PROJECT_DIR:/app" -w /app \
+  -v "$PROJECT_DIR/backend:/app" -w /app \
   -v "$SCRIPT_DIR/agent:/out" \
   golang:1.24-alpine sh -c "go build -ldflags='-s -w' -o /out/agent-cli ./cmd/agent-cli"
 
