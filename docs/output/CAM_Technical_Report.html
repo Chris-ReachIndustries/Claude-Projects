@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reach Industries &mdash; Claude Agent Manager</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* ── PrintingPress — A4 Portrait Layout ── */
+/* @page content rules (header/footer text) are injected by build.py */
+
+@page {
+  size: A4 portrait;
+  margin: 15mm 18mm 15mm 18mm;
+  @top-left {
+    content: element(header-logo);
+    vertical-align: middle;
+  }
+  @bottom-right {
+    content: counter(page);
+    font-family: Inter, Helvetica, sans-serif;
+    font-size: 7pt;
+    color: #9ca3af;
+  }
+}
+@page :first {
+  margin: 0;
+  @top-left    { content: none; }
+  @top-right   { content: none; }
+  @bottom-right{ content: none; }
+  @bottom-left { content: none; }
+}
+
+/* ── PrintingPress — Reach Industries Cover Page ── */
+
+.cover {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  background: #041077;
+  display: flex;
+  flex-direction: column;
+  page-break-after: always;
+  overflow: hidden;
+}
+.cover-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12mm 16mm 0;
+  position: relative;
+  z-index: 1;
+}
+.cover-brand { display: flex; align-items: center; gap: 4mm; }
+.cover-logo-box {
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 2mm 3mm;
+  display: flex;
+  align-items: center;
+}
+.cover-logo-box img { height: 28pt; }
+.cover-company {
+  font-size: 12pt;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 1.2pt;
+  text-transform: uppercase;
+  padding-left: 4mm;
+  border-left: 1.5pt solid rgba(77,101,255,0.7);
+}
+.cover-badge {
+  font-size: 7pt;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.8pt;
+  border: 0.5pt solid rgba(255,255,255,0.2);
+  padding: 1.5mm 3mm;
+  border-radius: 2px;
+}
+.cover-stripe {
+  width: 100%;
+  height: 5pt;
+  background: linear-gradient(90deg, #4d65ff 0%, #4d65ff 45%, #1f2937 72%, #dc2626 100%);
+  flex-shrink: 0;
+  margin-top: 9mm;
+}
+.cover-bg {
+  position: absolute;
+  right: 0;
+  bottom: 30mm;
+  font-size: 120pt;
+  font-weight: 900;
+  color: rgba(255,255,255,0.025);
+  letter-spacing: -4pt;
+  line-height: 1;
+}
+.cover-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 16mm 5mm;
+  position: relative;
+  z-index: 1;
+}
+.cover-eyebrow {
+  font-size: 8pt;
+  font-weight: 700;
+  color: #4d65ff;
+  letter-spacing: 1.8pt;
+  text-transform: uppercase;
+  margin-bottom: 6mm;
+}
+.cover-title {
+  font-size: 28pt;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: -0.5pt;
+  margin-bottom: 4mm;
+}
+.cover-subtitle {
+  font-size: 10.5pt;
+  font-weight: 300;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.5;
+  max-width: 155mm;
+  margin-bottom: 7mm;
+}
+.cover-pills { display: flex; gap: 2.5mm; flex-wrap: wrap; }
+.cover-pill {
+  font-size: 7pt;
+  font-weight: 700;
+  border-radius: 2px;
+  padding: 1.5mm 3mm;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+}
+.cover-pill.pill-1 { background: rgba(77,101,255,0.3); color: #93c5fd; }
+.cover-pill.pill-2 { background: rgba(31,41,55,0.6);   color: #d1d5db; }
+.cover-pill.pill-3 { background: rgba(220,38,38,0.25); color: #fca5a5; }
+.cover-bottom-bar { display: flex; flex-shrink: 0; }
+.cover-bar-a {
+  flex: 3;
+  height: 12mm;
+  background: #1e3a8a;
+  display: flex; align-items: center; padding-left: 16mm;
+  font-size: 6.5pt; font-weight: 600; color: rgba(255,255,255,0.5);
+  text-transform: uppercase; letter-spacing: 0.8pt;
+}
+.cover-bar-b {
+  flex: 1;
+  height: 12mm;
+  background: #7f1d1d;
+  display: flex; align-items: center; padding-left: 6mm;
+  font-size: 6.5pt; font-weight: 600; color: rgba(255,255,255,0.5);
+  text-transform: uppercase; letter-spacing: 0.8pt;
+}
+.cover-footer {
+  padding: 5mm 16mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 0.5pt solid rgba(255,255,255,0.12);
+}
+.cover-footer-left { font-size: 7.5pt; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5pt; }
+.cover-footer-right { font-size: 8pt; color: rgba(255,255,255,0.4); }
+
+/* ── PrintingPress — Base Typography & Layout ── */
+/* Inter font is loaded by build.py at the top of the stylesheet */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Inter, -apple-system, Helvetica, Arial, sans-serif;
+  font-size: 9.5pt;
+  font-weight: 400;
+  color: #111827;
+  line-height: 1.6;
+}
+
+/* ── PAGE BREAKS ── */
+.page { page-break-before: always; }
+
+/* ── HEADINGS ── */
+.h1 {
+  font-size: 19pt;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4mm;
+  padding-bottom: 3mm;
+  border-bottom: 2pt solid #1e3a8a;
+}
+.h2 {
+  font-size: 13pt;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-top: 7mm;
+  margin-bottom: 3mm;
+}
+.h3 {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 4mm;
+  margin-bottom: 2mm;
+}
+
+/* ── BODY TEXT ── */
+.p {
+  margin-bottom: 3mm;
+  font-size: 9.5pt;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* ── UNORDERED LIST ── */
+.ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 3mm;
+}
+.ul li {
+  padding-left: 5mm;
+  position: relative;
+  margin-bottom: 2mm;
+  font-size: 9.5pt;
+  line-height: 1.55;
+  color: #374151;
+}
+.ul li::before { content: "\2013"; position: absolute; left: 0; color: #9ca3af; }
+
+/* ── ORDERED LIST ── */
+.ol {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 3mm;
+  counter-reset: ol-counter;
+}
+.ol li {
+  padding-left: 7mm;
+  position: relative;
+  margin-bottom: 2.5mm;
+  font-size: 9.5pt;
+  line-height: 1.55;
+  color: #374151;
+  counter-increment: ol-counter;
+}
+.ol li::before {
+  content: counter(ol-counter) ".";
+  position: absolute;
+  left: 0;
+  color: #6b7280;
+  font-weight: 700;
+}
+
+/* ── HORIZONTAL RULE ── */
+hr.rule { border: none; border-top: 1pt solid #e5e7eb; margin: 6mm 0; }
+
+/* ── RUNNING HEADER LOGO ── */
+#header-logo { position: running(header-logo); }
+#header-logo img { height: 11pt; }
+
+/* ── PrintingPress — Callouts, Evidence & Expectation Boxes ── */
+
+/* ── EXPECTATION / FORWARD-LOOKING BOX ── */
+.expect {
+  background: #eff6ff;
+  border: 0.5pt solid #bfdbfe;
+  border-left: 3pt solid #1d4ed8;
+  border-radius: 3px;
+  padding: 3.5mm 4mm;
+  margin-top: 4mm;
+}
+.expect-label {
+  font-size: 7pt;
+  font-weight: 700;
+  color: #1d4ed8;
+  text-transform: uppercase;
+  letter-spacing: 0.5pt;
+  margin-bottom: 2mm;
+  display: block;
+}
+
+/* ── CALLOUT BOX (amber warning) ── */
+.callout {
+  background: #fef9f0;
+  border: 0.5pt solid #fcd34d;
+  border-left: 3pt solid #d97706;
+  border-radius: 3px;
+  padding: 3.5mm 4mm;
+  margin: 4mm 0;
+}
+.callout.critical {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  border-left-color: #dc2626;
+}
+
+/* ── EVIDENCE / QUOTE BLOCK ── */
+.evidence {
+  background: #f9fafb;
+  border-left: 2pt solid #d1d5db;
+  padding: 2mm 3.5mm;
+  margin: 2mm 0;
+  font-size: 8.5pt;
+  color: #4b5563;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* ── PrintingPress — Person Cards & Badges ── */
+
+/* ── PERSON HEADER ── */
+.person-hdr {
+  display: flex;
+  align-items: center;
+  gap: 4mm;
+  padding: 4mm 5mm;
+  border-left: 3.5pt solid #1e3a8a;
+  border-radius: 4px 4px 0 0;
+}
+.person-hdr.red   { border-left-color: #dc2626; background: #fef9f9; }
+.person-hdr.amber { border-left-color: #d97706; background: #fffdf5; }
+.person-hdr.green { border-left-color: #16a34a; background: #f7fdf9; }
+.person-hdr.blue  { border-left-color: #1d4ed8; background: #f0f7ff; }
+.person-hdr.grey  { border-left-color: #6b7280; background: #f8fafc; }
+
+.person-name { font-size: 15pt; font-weight: 800; color: #111827; line-height: 1.1; }
+.person-role { font-size: 8pt; color: #6b7280; margin-top: 0.5mm; }
+
+/* ── BADGES ── */
+.badge {
+  margin-left: auto;
+  font-size: 7pt;
+  font-weight: 700;
+  padding: 1.5mm 3mm;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.badge-red   { background: #fef2f2; color: #dc2626; border: 0.5pt solid #fca5a5; }
+.badge-amber { background: #fffbeb; color: #b45309; border: 0.5pt solid #fcd34d; }
+.badge-green { background: #f0fdf4; color: #16a34a; border: 0.5pt solid #86efac; }
+.badge-blue  { background: #eff6ff; color: #1d4ed8; border: 0.5pt solid #bfdbfe; }
+.badge-grey  { background: #f8fafc; color: #64748b; border: 0.5pt solid #cbd5e1; }
+
+/* ── PERSON BODY ── */
+.person-body {
+  padding: 4mm 5mm;
+  border: 0.5pt solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  margin-bottom: 5mm;
+}
+
+/* ── TEAM CHIPS ── */
+.team-row { display: flex; flex-direction: column; gap: 2mm; margin-bottom: 4mm; }
+.team-item { display: flex; align-items: center; gap: 2.5mm; font-size: 9.5pt; color: #374151; }
+.chip {
+  font-size: 7pt;
+  font-weight: 700;
+  padding: 0.8mm 2.5mm;
+  border-radius: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.chip-lead   { background: #eff6ff; color: #1d4ed8; border: 0.5pt solid #bfdbfe; }
+.chip-senior { background: #f0fdf4; color: #16a34a; border: 0.5pt solid #86efac; }
+.chip-mid    { background: #faf5ff; color: #7c3aed; border: 0.5pt solid #ddd6fe; }
+
+/* ── INTRO CARD ── */
+.intro-card {
+  background: #f8fafc;
+  border: 0.5pt solid #e5e7eb;
+  border-radius: 4px;
+  padding: 4mm 5mm;
+  margin-bottom: 5mm;
+}
+
+/* ── PrintingPress — Recommendations & Gap Lists ── */
+
+/* ── NUMBERED RECOMMENDATION LIST ── */
+.rec-list { list-style: none; padding: 0; }
+.rec-item { display: flex; gap: 3.5mm; margin-bottom: 4mm; align-items: flex-start; }
+.rec-num {
+  width: 7mm;
+  height: 7mm;
+  background: #1e3a8a;
+  color: #ffffff;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8pt;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 0.5mm;
+}
+.rec-body { flex: 1; font-size: 9.5pt; color: #374151; line-height: 1.55; }
+
+/* ── GAP LIST ── */
+.gap-list { list-style: none; padding: 0; }
+.gap-item {
+  display: flex;
+  gap: 3mm;
+  padding: 2.5mm 0;
+  border-bottom: 0.5pt solid #f3f4f6;
+  font-size: 9.5pt;
+  color: #374151;
+  align-items: flex-start;
+}
+.gap-num { flex-shrink: 0; width: 5mm; font-weight: 700; color: #dc2626; }
+
+/* ── PrintingPress — Meeting Script / Dialogue Boxes ── */
+
+.script {
+  background: #f0f4f8;
+  border-left: 3pt solid #3b82f6;
+  border-radius: 3px;
+  padding: 3.5mm 4mm;
+  margin: 3mm 0;
+  font-size: 9.5pt;
+  font-style: italic;
+  color: #1e3a5f;
+  line-height: 1.55;
+}
+.script-label {
+  font-size: 7pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+  color: #3b82f6;
+  margin-bottom: 1.5mm;
+  font-style: normal;
+}
+
+/* ── PHASE BADGE ── */
+.phase-badge {
+  display: inline-block;
+  background: #1e3a8a;
+  color: #ffffff;
+  font-size: 7pt;
+  font-weight: 800;
+  padding: 1mm 3mm;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5pt;
+  margin-bottom: 2mm;
+}
+
+/* ── CHECK LIST ── */
+.check-list { list-style: none; padding-left: 0; }
+.check-list li {
+  padding: 1.5mm 0 1.5mm 6mm;
+  font-size: 9pt;
+  color: #374151;
+  position: relative;
+}
+.check-list li::before {
+  content: "\2013  ";
+  position: absolute;
+  left: 0;
+  font-size: 10pt;
+  color: #6b7280;
+}
+
+/* ── PrintingPress — Tables ── */
+
+table.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 4mm;
+  font-size: 8.5pt;
+}
+table.table th {
+  background: #1e3a8a;
+  color: #ffffff;
+  padding: 2.5mm 3.5mm;
+  text-align: left;
+  font-weight: 700;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+}
+table.table td {
+  padding: 2.5mm 3.5mm;
+  border-bottom: 0.5pt solid #e5e7eb;
+  vertical-align: top;
+  color: #374151;
+  line-height: 1.5;
+}
+table.table tr:nth-child(even) td { background: #f9fafb; }
+
+/* ── STATUS CELLS ── */
+.td-red    { color: #dc2626; font-weight: 700; }
+.td-amber  { color: #b45309; font-weight: 600; }
+.td-green  { color: #16a34a; font-weight: 600; }
+.td-grey   { color: #6b7280; }
+
+/* ── VELOCITY CELLS ── */
+.td-vel-high { color: #16a34a; font-weight: 700; }
+.td-vel-mid  { color: #d97706; font-weight: 700; }
+
+
+@page {
+  @top-right {
+    content: "Claude Agent Manager";
+    font-family: Inter, Helvetica, sans-serif;
+    font-size: 6.5pt;
+    color: #9ca3af;
+    vertical-align: middle;
+  }
+  @bottom-left {
+    content: "Internal Use Only  \B7  April 2026";
+    font-family: Inter, Helvetica, sans-serif;
+    font-size: 6.5pt;
+    color: #d1d5db;
+    text-transform: uppercase;
+    letter-spacing: 0.5pt;
+    vertical-align: middle;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div id="header-logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA2AAAARMCAYAAAD/W/BnAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABBVpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDkuMS1jMDAyIDc5LmRiYTNkYTNiNSwgMjAyMy8xMi8xNS0xMDo0MjozNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ1dWlkOjVEMjA4OTI0OTNCRkRCMTE5MTRBODU5MEQzMTUwOEM4IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjdCMjA4ODA0RTkwMjExRUVCMkMwQ0Q3MEE0NzI3ODdEIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjdCMjA4ODAzRTkwMjExRUVCMkMwQ0Q3MEE0NzI3ODdEIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIElsbHVzdHJhdG9yIENDIDIzLjEgKFdpbmRvd3MpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6Y2YwMGY3NWEtODVlMi0xNDRkLWEzZWQtMmFiNGFmYWQwOTFjIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAu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" alt="Reach Industries"></div>
+<div class="cover">
+  <div class="cover-bg">REACH</div>
+  <div class="cover-top">
+    <div class="cover-brand">
+      <div class="cover-logo-box"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA2AAAARMCAYAAAD/W/BnAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABBVpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDkuMS1jMDAyIDc5LmRiYTNkYTNiNSwgMjAyMy8xMi8xNS0xMDo0MjozNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ1dWlkOjVEMjA4OTI0OTNCRkRCMTE5MTRBODU5MEQzMTUwOEM4IiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjdCMjA4ODA0RTkwMjExRUVCMkMwQ0Q3MEE0NzI3ODdEIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjdCMjA4ODAzRTkwMjExRUVCMkMwQ0Q3MEE0NzI3ODdEIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIElsbHVzdHJhdG9yIENDIDIzLjEgKFdpbmRvd3MpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6Y2YwMGY3NWEtODVlMi0xNDRkLWEzZWQtMmFiNGFmYWQwOTFjIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAu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" alt="Reach Industries"></div>
+      <div class="cover-company">Reach Industries</div>
+    </div>
+    <div class="cover-badge">Internal</div>
+  </div>
+  <div class="cover-stripe"></div>
+  <div class="cover-main">
+    <div class="cover-eyebrow">Technical Report &middot; April 2026</div>
+    <div class="cover-title">Claude Agent Manager</div>
+    <div class="cover-subtitle">Technical Architecture Report</div>
+    <div class="cover-pills"><span class="cover-pill pill-1">Go Backend</span><span class="cover-pill pill-2">Next.js Frontend</span><span class="cover-pill pill-3">Docker Agents</span></div>
+  </div>
+  <div class="cover-bottom-bar">
+    <div class="cover-bar-a">Reach Industries</div>
+    <div class="cover-bar-b">Claude Projects v1.0</div>
+  </div>
+  <div class="cover-footer">
+    <div class="cover-footer-left">Reach Industries &nbsp;&middot;&nbsp; Internal Use Only &nbsp;&middot;&nbsp; 2026</div>
+    <div class="cover-footer-right">reach.industries</div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: SYSTEM OVERVIEW                                              -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">1. System Overview</div>
+
+  <div class="h2">1.1 What is Claude Agent Manager?</div>
+  <p class="p">
+    Claude Agent Manager (published as <strong>Claude Projects</strong>) is a self-hosted platform
+    for orchestrating autonomous AI agents powered by Anthropic&rsquo;s Claude models. It provides
+    a complete infrastructure for spawning, managing, and monitoring Claude agents that run inside
+    isolated Docker containers, coordinated by a lead Project Manager (PM) agent that delegates
+    work to specialist sub-agents.
+  </p>
+  <p class="p">
+    The system transforms the single-user, single-session Claude CLI experience into a
+    multi-agent orchestration platform where a PM agent autonomously decomposes complex
+    projects into discrete tasks, selects specialists from a library of 162 pre-defined
+    roles, spawns them in purpose-built containers, conducts real-time conversations with
+    them, reviews their output, and iterates until deliverables meet quality standards.
+  </p>
+  <p class="p">
+    All agent activity &mdash; thinking, tool calls, inter-agent messages, file creation,
+    and strategic decisions &mdash; streams live to a Next.js dashboard via Server-Sent Events (SSE),
+    giving the user full visibility into the orchestration process without needing to intervene.
+  </p>
+
+  <div class="h2">1.2 The Problem It Solves</div>
+  <p class="p">
+    Large language models are powerful but fundamentally single-threaded in their default interfaces.
+    A single Claude session can research, write, or code &mdash; but it cannot simultaneously run
+    a market researcher, a data analyst, a copywriter, and a technical architect, then synthesise
+    their outputs into a coherent strategy. Claude Agent Manager solves this by providing:
+  </p>
+  <ul class="ul">
+    <li><strong>Parallel execution</strong> &mdash; multiple agents work simultaneously in isolated containers,
+        each with their own conversation context and tooling</li>
+    <li><strong>Specialist delegation</strong> &mdash; a PM agent selects the right specialist for each task
+        from a 162-role library, matching container images to requirements (data science agents get
+        pandas/matplotlib, web agents get Playwright/Chromium, PDF agents get WeasyPrint)</li>
+    <li><strong>Context isolation</strong> &mdash; each agent operates in its own container with a focused
+        system prompt and task description, avoiding the context pollution that degrades quality
+        in long single-agent sessions</li>
+    <li><strong>Persistent orchestration</strong> &mdash; the PM agent maintains a continuous conversation
+        thread across dozens of sub-agent interactions, building on findings rather than starting fresh</li>
+    <li><strong>Enterprise auth compatibility</strong> &mdash; works with existing Claude Pro/Team/Enterprise
+        subscriptions via OAuth bridge discovery, requiring no separate API key purchase</li>
+  </ul>
+
+  <div class="h2">1.3 Target Users</div>
+  <p class="p">
+    Claude Projects is designed for technical teams and individual power users who need to:
+  </p>
+  <ul class="ul">
+    <li>Execute complex, multi-phase projects that require diverse specialist knowledge</li>
+    <li>Produce multiple coordinated deliverables (reports, code, analyses, documentation)</li>
+    <li>Maintain quality control over AI-generated output through PM review cycles</li>
+    <li>Run AI workloads in controlled, isolated environments with resource limits</li>
+    <li>Leverage existing Claude subscriptions without additional API cost management</li>
+  </ul>
+  <p class="p">
+    The self-hosted architecture (Docker Compose on a local machine or server) appeals to
+    users who want full control over their agent infrastructure, data, and credentials.
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: ARCHITECTURE                                                 -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">2. Architecture</div>
+
+  <p class="p">
+    The system consists of four major components: a Go API backend, a Next.js frontend,
+    a custom Go agent CLI binary, and a fleet of 7 specialized Docker container images.
+    These communicate via REST APIs, Server-Sent Events, and a shared Docker-mounted workspace.
+  </p>
+
+  <div class="h2">2.1 Backend: Go API Server</div>
+  <p class="p">
+    The backend is a single Go binary (<code>cmd/server/main.go</code>) that serves as the
+    central coordination hub. It runs on port 9222 inside a Docker container with access to
+    the Docker socket for spawning agent containers.
+  </p>
+
+  <div class="h3">Core Components</div>
+  <table class="table">
+    <tr>
+      <th style="width:25%">Component</th>
+      <th style="width:35%">Package</th>
+      <th style="width:40%">Responsibility</th>
+    </tr>
+    <tr>
+      <td>HTTP Router</td>
+      <td><code>internal/api/router.go</code></td>
+      <td>70+ REST endpoints using Go 1.22 enhanced ServeMux with method routing</td>
+    </tr>
+    <tr>
+      <td>SSE Broker</td>
+      <td><code>internal/api/sse.go</code></td>
+      <td>Real-time event broadcasting to dashboard clients (max 10 concurrent)</td>
+    </tr>
+    <tr>
+      <td>Container Spawner</td>
+      <td><code>internal/services/spawner.go</code></td>
+      <td>Channel-driven Docker container lifecycle management</td>
+    </tr>
+    <tr>
+      <td>Database</td>
+      <td><code>internal/db/</code></td>
+      <td>SQLite with WAL mode, 12 entity-specific files, triggers, migrations</td>
+    </tr>
+    <tr>
+      <td>Auth Middleware</td>
+      <td><code>internal/api/auth.go</code></td>
+      <td>API key authentication with setup-wizard bypass</td>
+    </tr>
+    <tr>
+      <td>Role Library</td>
+      <td><code>internal/roles/</code></td>
+      <td>162 embedded agent roles with system prompts, loaded via <code>go:embed</code></td>
+    </tr>
+  </table>
+
+  <div class="h3">API Surface</div>
+  <p class="p">
+    The router exposes a comprehensive REST API organised into resource groups:
+  </p>
+  <ul class="ul">
+    <li><strong>Agents</strong> (14 endpoints) &mdash; CRUD, updates, messages, relay, files, export, close, resume</li>
+    <li><strong>Projects</strong> (11 endpoints) &mdash; CRUD, start/pause/complete lifecycle, spawn agents, unified timeline</li>
+    <li><strong>Launch Requests</strong> (3 endpoints) &mdash; queue-based container spawn requests</li>
+    <li><strong>Workflows</strong> (5 endpoints) &mdash; multi-step automated workflows</li>
+    <li><strong>Webhooks</strong> (4 endpoints) &mdash; external notification integration</li>
+    <li><strong>Push</strong> (3 endpoints) &mdash; Web Push notification subscriptions</li>
+    <li><strong>Retention</strong> (3 endpoints) &mdash; automated data cleanup</li>
+    <li><strong>Settings</strong> (3 endpoints) &mdash; setup wizard and configuration</li>
+    <li><strong>Roles</strong> (3 endpoints) &mdash; agent role library search and retrieval</li>
+    <li><strong>Workspace</strong> (2 endpoints) &mdash; project file browsing</li>
+    <li><strong>SSE</strong> (1 endpoint) &mdash; real-time event stream</li>
+    <li><strong>Health</strong> (2 endpoints) &mdash; server and database health checks</li>
+  </ul>
+  <p class="p">
+    Middleware is stacked as: CORS &rarr; Auth &rarr; Gzip &rarr; Router. SSE connections are
+    explicitly excluded from gzip compression to maintain streaming semantics.
+  </p>
+
+  <div class="h3">Background Services</div>
+  <p class="p">
+    The server starts several goroutines alongside the HTTP listener:
+  </p>
+  <ul class="ul">
+    <li><strong>Container Spawner</strong> &mdash; processes launch request queue via channel notification</li>
+    <li><strong>Container Health Checker</strong> &mdash; polls Docker every 2 minutes for crashed containers</li>
+    <li><strong>Auto-Archive Sweep</strong> &mdash; archives agents inactive for 30+ minutes every 5 minutes</li>
+    <li><strong>Backup Scheduler</strong> &mdash; periodic SQLite database backups</li>
+    <li><strong>Retention Service</strong> &mdash; automated cleanup of old data based on retention policies</li>
+  </ul>
+</div>
+
+<div class="page">
+  <div class="h2">2.2 Database: SQLite with WAL</div>
+  <p class="p">
+    The database layer uses SQLite in WAL (Write-Ahead Logging) mode, split across 12
+    entity-specific Go files in <code>internal/db/</code>. The schema defines 10 tables
+    with referential integrity, computed field triggers, and indexed foreign keys.
+  </p>
+
+  <div class="h3">Schema Overview</div>
+  <table class="table">
+    <tr>
+      <th style="width:22%">Table</th>
+      <th style="width:18%">Key Columns</th>
+      <th style="width:60%">Purpose</th>
+    </tr>
+    <tr>
+      <td><code>agents</code></td>
+      <td>23 columns</td>
+      <td>Agent records with status, project linkage, parent-child relationships,
+          computed fields (pending messages, unread updates, latest summary)</td>
+    </tr>
+    <tr>
+      <td><code>updates</code></td>
+      <td>6 columns</td>
+      <td>Agent activity timeline: text, thinking, tool calls, errors, status changes</td>
+    </tr>
+    <tr>
+      <td><code>messages</code></td>
+      <td>8 columns</td>
+      <td>Inter-agent and user-agent messages with delivery tracking (pending/delivered/acknowledged/executed)</td>
+    </tr>
+    <tr>
+      <td><code>files</code></td>
+      <td>9 columns</td>
+      <td>Uploaded file metadata with disk-based storage (migrated from BLOB)</td>
+    </tr>
+    <tr>
+      <td><code>projects</code></td>
+      <td>11 columns</td>
+      <td>Project records with PM agent linkage, concurrency limits, autonomy mode</td>
+    </tr>
+    <tr>
+      <td><code>project_updates</code></td>
+      <td>4 columns</td>
+      <td>Project-level timeline events (milestones, decisions, info, errors)</td>
+    </tr>
+    <tr>
+      <td><code>launch_requests</code></td>
+      <td>10 columns</td>
+      <td>Container spawn queue: new, resume, terminate requests with lifecycle tracking</td>
+    </tr>
+    <tr>
+      <td><code>settings</code></td>
+      <td>2 columns</td>
+      <td>Key-value configuration store (workspace root, auth paths, resource limits)</td>
+    </tr>
+    <tr>
+      <td><code>webhooks</code></td>
+      <td>6 columns</td>
+      <td>External webhook notification targets with failure tracking</td>
+    </tr>
+    <tr>
+      <td><code>workflows</code></td>
+      <td>8 columns</td>
+      <td>Multi-step automated workflow definitions and execution state</td>
+    </tr>
+  </table>
+
+  <div class="h3">Triggers and Computed Fields</div>
+  <p class="p">
+    Two SQLite triggers maintain denormalized counters on the agents table for dashboard
+    performance. <code>after_message_insert</code> increments <code>pending_message_count</code>
+    and caches the latest message. <code>after_update_insert</code> increments
+    <code>unread_update_count</code> and caches the latest summary. These avoid expensive
+    JOIN queries when listing agents in the dashboard.
+  </p>
+
+  <div class="h3">Migration Strategy</div>
+  <p class="p">
+    Migrations are additive-only <code>ALTER TABLE ADD COLUMN</code> statements that ignore
+    &ldquo;duplicate column&rdquo; errors. This allows the schema to evolve without versioning
+    or rollback support. One exception: the <code>updates</code> table CHECK constraint was
+    removed by recreating the table (SQLite lacks <code>ALTER CHECK</code>), migrating data
+    from the old table to the new one.
+  </p>
+</div>
+
+<div class="page">
+  <div class="h2">2.3 Frontend: Next.js Dashboard</div>
+  <p class="p">
+    The frontend is a Next.js application (App Router) running on port 4173, built with
+    TypeScript and Tailwind CSS. It provides the user-facing dashboard for creating projects,
+    monitoring agents, and viewing real-time activity.
+  </p>
+
+  <div class="h3">Key Components</div>
+  <table class="table">
+    <tr>
+      <th style="width:30%">Component</th>
+      <th style="width:70%">Responsibility</th>
+    </tr>
+    <tr>
+      <td><code>SSEProvider</code></td>
+      <td>React Context that manages a single EventSource connection to <code>/api/events</code>,
+          dispatches typed events to subscribers via a pub-sub pattern with automatic reconnection (3s backoff)</td>
+    </tr>
+    <tr>
+      <td><code>UnifiedTimeline</code></td>
+      <td>Merges agent updates, messages, and project updates into a single chronologically-sorted
+          feed with type-specific rendering (thinking blocks as violet cards, tool calls as compact
+          monospace lines, messages as chat bubbles, project events as colored badges)</td>
+    </tr>
+    <tr>
+      <td><code>AuthGate</code></td>
+      <td>Guards all routes, prompts for API key on first visit, stores in localStorage</td>
+    </tr>
+    <tr>
+      <td>Spawn Dialog</td>
+      <td>Role picker with 162-role searchable library, container image selection, task input</td>
+    </tr>
+  </table>
+
+  <div class="h3">SSE Event Types</div>
+  <p class="p">
+    The frontend subscribes to 10 SSE event types:
+  </p>
+  <ul class="ul">
+    <li><code>agent-updated</code> / <code>agent-deleted</code> &mdash; agent state changes</li>
+    <li><code>message-queued</code> &mdash; new message for an agent</li>
+    <li><code>project-created</code> / <code>project-updated</code> / <code>project-deleted</code> &mdash; project lifecycle</li>
+    <li><code>launch-request-created</code> / <code>launch-request-updated</code> &mdash; container spawn progress</li>
+    <li><code>container-health</code> &mdash; crashed container notifications</li>
+    <li><code>shutdown</code> &mdash; server restart signal (triggers reconnect, not exit)</li>
+  </ul>
+
+  <div class="h3">Unified Timeline Design</div>
+  <p class="p">
+    The <code>UnifiedTimeline</code> component is the primary interface for understanding what
+    agents are doing. It accepts three optional data sources &mdash; agent updates, messages, and
+    project updates &mdash; merges them by timestamp, and renders each entry type distinctly:
+  </p>
+  <ul class="ul">
+    <li><strong>Thinking</strong> &mdash; violet background card with brain icon, italic text, truncated to 500 chars</li>
+    <li><strong>Tool calls</strong> &mdash; compact monospace line showing tool name + parsed argument summary</li>
+    <li><strong>Status</strong> &mdash; minimal grey dot with text</li>
+    <li><strong>Errors</strong> &mdash; red background with alert icon</li>
+    <li><strong>Text/Info</strong> &mdash; grey card with formatted markdown (bold, italic, code, bullet lists)</li>
+    <li><strong>Messages</strong> &mdash; chat bubble layout (user messages right-aligned in primary colour,
+        agent messages left-aligned with source agent label)</li>
+    <li><strong>Project events</strong> &mdash; coloured badges by type (milestone=green, decision=purple,
+        info=blue, error=red)</li>
+  </ul>
+  <p class="p">
+    The timeline auto-scrolls to the bottom as new entries arrive, providing a live-feed
+    experience of agent activity.
+  </p>
+</div>
+
+<div class="page">
+  <div class="h2">2.4 Agent CLI: Custom Go Binary</div>
+  <p class="p">
+    The agent CLI (<code>cmd/agent-cli/</code>) is a custom Go binary compiled to ~8MB that runs
+    inside every agent container. It implements a complete agentic loop with 30+ tools, session
+    persistence, OAuth authentication, dashboard integration, and inter-agent communication.
+  </p>
+
+  <div class="h3">Architecture of the CLI</div>
+  <table class="table">
+    <tr>
+      <th style="width:22%">File</th>
+      <th style="width:78%">Responsibility</th>
+    </tr>
+    <tr>
+      <td><code>main.go</code></td>
+      <td>Entry point: flag parsing, authentication, mode selection (agent vs single-prompt)</td>
+    </tr>
+    <tr>
+      <td><code>api.go</code></td>
+      <td>Anthropic SDK client wrapper, tool definitions (30+ tools), response extraction</td>
+    </tr>
+    <tr>
+      <td><code>loop.go</code></td>
+      <td>Agentic loop (200 iterations max), PM tool restriction, inter-turn message injection,
+          agent mode with continuous conversation, sub-agent auto-close protocol</td>
+    </tr>
+    <tr>
+      <td><code>auth.go</code></td>
+      <td>OAuth bridge discovery: reads <code>.credentials.json</code>, creates code session,
+          acquires bridge worker JWT. Falls back to <code>ANTHROPIC_API_KEY</code></td>
+    </tr>
+    <tr>
+      <td><code>session.go</code></td>
+      <td>Conversation persistence: JSON serialization of system prompt + message history,
+          agent-ID-keyed file storage, resume on container restart</td>
+    </tr>
+    <tr>
+      <td><code>dashboard.go</code></td>
+      <td>Dashboard client: registration, update posting, message polling, file upload,
+          relay messaging, health checks</td>
+    </tr>
+    <tr>
+      <td><code>sse.go</code></td>
+      <td>SSE client: connects to backend event stream, filters for messages addressed to this
+          agent, delivers to channel for inter-turn injection. Exponential backoff reconnection.</td>
+    </tr>
+    <tr>
+      <td><code>tools_*.go</code></td>
+      <td>Tool implementations: file operations, bash execution, search (grep/glob), web
+          fetch/search, git operations, code intelligence, task management, scheduling, scratchpad</td>
+    </tr>
+  </table>
+
+  <div class="h3">Tool Categories (30+ Tools)</div>
+  <table class="table">
+    <tr>
+      <th style="width:22%">Category</th>
+      <th style="width:78%">Tools</th>
+    </tr>
+    <tr>
+      <td>File Operations</td>
+      <td><code>bash</code>, <code>read_file</code>, <code>write_file</code>, <code>edit_file</code>, <code>list_files</code></td>
+    </tr>
+    <tr>
+      <td>Search</td>
+      <td><code>grep</code>, <code>glob</code>, <code>find_definition</code>, <code>find_references</code></td>
+    </tr>
+    <tr>
+      <td>Orchestration</td>
+      <td><code>spawn_agent</code>, <code>relay_message</code>, <code>list_project_agents</code>,
+          <code>close_agent</code>, <code>post_update</code>, <code>search_roles</code></td>
+    </tr>
+    <tr>
+      <td>Collaboration</td>
+      <td><code>scratchpad_write</code>, <code>scratchpad_read</code>, <code>ask_user</code>,
+          <code>plan_mode</code></td>
+    </tr>
+    <tr>
+      <td>Web</td>
+      <td><code>web_fetch</code>, <code>web_search</code></td>
+    </tr>
+    <tr>
+      <td>Git</td>
+      <td><code>git_status</code>, <code>git_diff</code>, <code>git_commit</code>, <code>git_log</code></td>
+    </tr>
+    <tr>
+      <td>Task Management</td>
+      <td><code>task_create</code>, <code>task_update</code>, <code>task_list</code></td>
+    </tr>
+    <tr>
+      <td>Scheduling</td>
+      <td><code>schedule_task</code>, <code>cancel_schedule</code>, <code>list_schedules</code></td>
+    </tr>
+    <tr>
+      <td>Notebooks</td>
+      <td><code>notebook_edit</code></td>
+    </tr>
+  </table>
+</div>
+
+<div class="page">
+  <div class="h2">2.5 Container Images: 7 Specialized Types</div>
+  <p class="p">
+    Every agent runs inside a Docker container built from one of 7 purpose-built images.
+    Each image includes the <code>agent-cli</code> binary plus the specific tooling needed
+    for its specialisation. The build process (<code>images/build.sh</code>) cross-compiles
+    the Go CLI binary using <code>golang:1.24-alpine</code>, then copies it into each image.
+  </p>
+
+  <table class="table">
+    <tr>
+      <th style="width:25%">Image</th>
+      <th style="width:10%">Size</th>
+      <th style="width:15%">Base</th>
+      <th style="width:50%">Included Tools</th>
+    </tr>
+    <tr>
+      <td><code>claude-agent</code></td>
+      <td>49MB</td>
+      <td>Alpine 3.20</td>
+      <td>bash, curl, git, jq. The minimal base for research, writing, planning, analysis.</td>
+    </tr>
+    <tr>
+      <td><code>claude-agent-dev</code></td>
+      <td>400MB</td>
+      <td>Python 3.12 + Node.js</td>
+      <td>Full development environment. For coding, scripting, and general software development.</td>
+    </tr>
+    <tr>
+      <td><code>claude-agent-go</code></td>
+      <td>431MB</td>
+      <td>Go 1.24 Alpine</td>
+      <td>Go compiler + build tools + make. For Go development and compilation.</td>
+    </tr>
+    <tr>
+      <td><code>claude-agent-data</code></td>
+      <td>~1GB</td>
+      <td>Python 3.12 Slim</td>
+      <td>pandas, numpy, scipy, matplotlib, seaborn, scikit-learn, plotly, openpyxl. For data
+          analysis, visualisation, CSV processing, statistical modelling.</td>
+    </tr>
+    <tr>
+      <td><code>claude-agent-doc-reader</code></td>
+      <td>652MB</td>
+      <td>Python 3.12 Slim</td>
+      <td>pdfplumber, pdfminer, pypdfium2, python-docx, openpyxl, python-pptx, pandas. For
+          reading PDFs, Word docs, Excel files, PowerPoint presentations.</td>
+    </tr>
+    <tr>
+      <td><code>claude-agent-web</code></td>
+      <td>1.9GB</td>
+      <td>Node.js 20 Slim</td>
+      <td>Playwright + Chromium. For web scraping, automated testing, screenshots, browser
+          automation.</td>
+    </tr>
+    <tr>
+      <td><code>claude-agent-printingpress</code></td>
+      <td>530MB</td>
+      <td>Python 3.12 Slim</td>
+      <td>WeasyPrint, cairosvg, Pillow + bundled PrintingPress build system at
+          <code>/opt/printingpress/</code>. For professional branded PDF report generation.</td>
+    </tr>
+  </table>
+
+  <p class="p">
+    All images share a common pattern: non-root <code>agent</code> user, git configured with
+    safe directory for <code>/workspace</code>, and <code>agent-cli</code> as the entrypoint.
+    The workspace directory is bind-mounted from the host at container creation time, ensuring
+    all agents in a project share the same filesystem view.
+  </p>
+
+  <div class="h2">2.6 Communication Architecture</div>
+  <p class="p">
+    The system uses three communication channels:
+  </p>
+
+  <div class="h3">REST API (Agent &harr; Backend)</div>
+  <p class="p">
+    Agent containers communicate with the backend via HTTP REST calls to
+    <code>http://host.docker.internal:9222</code>. The dashboard client in each agent
+    (<code>dashboard.go</code>) posts updates, polls messages, uploads files, and manages
+    relay messaging. All requests include the <code>DASHBOARD_API_KEY</code> for authentication.
+  </p>
+
+  <div class="h3">SSE (Backend &rarr; Frontend and Backend &rarr; Agent)</div>
+  <p class="p">
+    The SSE broker broadcasts typed events to all connected clients. Both the frontend and
+    agent CLI maintain persistent SSE connections to <code>/api/events</code>. Agents filter
+    events by their own ID to receive targeted messages. The broker supports up to 10 concurrent
+    clients with 30-second keepalive pings.
+  </p>
+
+  <div class="h3">Relay Messages (Agent &harr; Agent via Backend)</div>
+  <p class="p">
+    Inter-agent communication uses the <code>relay_message</code> tool, which POSTs to the
+    backend&rsquo;s relay endpoint. The backend stores the message in the <code>messages</code>
+    table and broadcasts a <code>message-queued</code> SSE event. The target agent receives it
+    either via SSE (instant) or the next poll cycle (10-second fallback). The <code>wait_for_reply</code>
+    option blocks the sender for up to 2 minutes waiting for a response.
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: HOW IT WORKS                                                 -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">3. How It Works</div>
+
+  <div class="h2">3.1 Project Creation and PM Spawn</div>
+  <p class="p">
+    The orchestration lifecycle begins when a user creates a project in the dashboard:
+  </p>
+  <ol class="ol">
+    <li>User provides a project name, description, workspace folder, and concurrency limit (default: 4 agents)</li>
+    <li>Backend creates the project record and auto-generates a URL-safe folder slug</li>
+    <li>User clicks &ldquo;Start Project&rdquo; with an optional initial prompt</li>
+    <li>Backend generates a comprehensive PM system prompt via <code>generatePMPrompt()</code></li>
+    <li>A launch request is created with type <code>new</code> and project metadata (PM prompt, user description)</li>
+    <li>The spawner is notified via its channel and immediately processes the request</li>
+    <li>A Docker container is spawned with the <code>claude-agent</code> image, project workspace mounted at
+        <code>/workspace</code>, and environment variables for project ID, agent URL, and auth credentials</li>
+    <li>The container starts <code>agent-cli</code>, which registers with the backend, receives any pending
+        messages, and enters the agentic loop with the PM system prompt and user&rsquo;s project description</li>
+  </ol>
+
+  <div class="h2">3.2 PM System Prompt Design</div>
+  <p class="p">
+    The PM agent receives a carefully crafted system prompt (generated by <code>generatePMPrompt()</code>
+    in <code>projects.go</code>) that defines its operational framework:
+  </p>
+  <ul class="ul">
+    <li><strong>Identity</strong> &mdash; &ldquo;You are the lead strategist managing project: [name]&rdquo;</li>
+    <li><strong>Available tools</strong> &mdash; only orchestration tools (spawn, relay, read, close, post_update,
+        scratchpad, list_agents, search_roles, ask_user, tasks)</li>
+    <li><strong>Container image guide</strong> &mdash; which image to select for which task type</li>
+    <li><strong>Agent lifecycle protocol</strong> &mdash; 6-step cycle: spawn &rarr; wait &rarr; read output &rarr;
+        have 2-3 exchanges &rarr; more work or close &rarr; never leave idle</li>
+    <li><strong>Quality standards</strong> &mdash; &ldquo;Read every agent&rsquo;s output and react to it&rdquo;,
+        &ldquo;Quality over quantity&rdquo;, &ldquo;Make hard calls&rdquo;</li>
+    <li><strong>Retry limits</strong> &mdash; maximum 3 attempts per task, tracked via scratchpad</li>
+    <li><strong>Completion protocol</strong> &mdash; verify deliverables exist, read key outputs, post final summary</li>
+    <li><strong>Autonomy mode</strong> &mdash; either &ldquo;AUTONOMOUS&rdquo; (no user approval needed) or
+        &ldquo;SUPERVISED&rdquo; (ask_user before major decisions)</li>
+  </ul>
+
+  <div class="h2">3.3 PM Tool Restriction and Delegation Enforcement</div>
+  <p class="p">
+    A critical design decision is that PM agents are restricted to orchestration tools only.
+    The enforcement is two-layered:
+  </p>
+  <ol class="ol">
+    <li><strong>Tool filtering at API call time</strong> &mdash; when the PM&rsquo;s agentic loop calls
+        <code>BuildTools()</code>, only tools in the <code>pmAllowedTools</code> whitelist are sent
+        to the Anthropic API. Claude never sees the work tools (bash, write_file, etc.) in its
+        available tool list.</li>
+    <li><strong>Runtime rejection</strong> &mdash; if the model somehow attempts a blocked tool call,
+        <code>executeTools()</code> checks the whitelist again and returns an error:
+        &ldquo;ERROR: As PM, you cannot use [tool] directly. Spawn a sub-agent to do this work.&rdquo;</li>
+  </ol>
+  <p class="p">
+    The 13 PM-allowed tools are: <code>spawn_agent</code>, <code>relay_message</code>,
+    <code>list_project_agents</code>, <code>post_update</code>, <code>close_agent</code>,
+    <code>read_file</code>, <code>list_files</code>, <code>scratchpad_write</code>,
+    <code>scratchpad_read</code>, <code>task_create</code>, <code>task_update</code>,
+    <code>task_list</code>, <code>ask_user</code>, and <code>search_roles</code>.
+    Note that <code>read_file</code> and <code>list_files</code> are included so the PM can
+    review sub-agent output without delegating the review itself.
+  </p>
+</div>
+
+<div class="page">
+  <div class="h2">3.4 Sub-Agent Orchestration</div>
+  <p class="p">
+    When the PM decides to spawn a sub-agent, the following sequence occurs:
+  </p>
+  <ol class="ol">
+    <li>PM calls <code>spawn_agent</code> with a role name, optional role_id (from the 162-role library),
+        a detailed task prompt, and optionally a container image</li>
+    <li>The agent CLI sends a POST to <code>/api/projects/{id}/spawn-agent</code></li>
+    <li>Backend validates concurrency limits (won&rsquo;t exceed <code>max_concurrent</code>),
+        looks up the role system prompt if role_id was provided, creates a launch request with
+        project metadata</li>
+    <li>Spawner processes the request: resolves workspace path (inheriting from project), constructs
+        Docker run arguments with environment variables (<code>PROJECT_ID</code>, <code>PARENT_AGENT_ID</code>,
+        <code>ROLE_ID</code>, <code>PROJECT_AGENTS</code> for sibling awareness)</li>
+    <li>Container starts, <code>agent-cli</code> registers with the dashboard, fetches its role&rsquo;s
+        system prompt from <code>/api/roles/{id}</code>, and begins working on its task</li>
+    <li>As the sub-agent works, it streams thinking and tool call events to the dashboard</li>
+    <li>When finished, the sub-agent messages the PM via <code>relay_message</code> with a summary
+        of findings and created files</li>
+    <li>The sub-agent then enters a 5-minute wait loop, listening for follow-up work from the PM</li>
+  </ol>
+
+  <div class="h2">3.5 Inter-Agent Messaging</div>
+  <p class="p">
+    The relay messaging system enables real-time conversations between agents:
+  </p>
+
+  <div class="h3">Message Flow</div>
+  <ol class="ol">
+    <li>Sending agent calls <code>relay_message(target_agent_id, content, wait_for_reply)</code></li>
+    <li>Agent CLI POSTs to <code>/api/agents/{id}/relay</code></li>
+    <li>Backend inserts message into the <code>messages</code> table for the target agent</li>
+    <li>Backend broadcasts <code>message-queued</code> SSE event with agent ID and content</li>
+    <li>Target agent&rsquo;s SSE client receives the event, filters by agent ID, pushes content
+        to its message channel</li>
+    <li>Between agentic loop turns, the target agent&rsquo;s <code>runPrompt()</code> drains the
+        message channel and injects messages as <code>[INCOMING MESSAGE FROM AGENT]</code> user messages</li>
+    <li>If <code>wait_for_reply=true</code>, the sender blocks for up to 2 minutes waiting for a
+        return message</li>
+  </ol>
+
+  <div class="h3">Message Injection Between Turns</div>
+  <p class="p">
+    This is the mechanism that makes the PM interruptible. After every tool execution cycle,
+    before the next API call to Claude, the loop performs a non-blocking drain of both the SSE
+    channel and the poll endpoint:
+  </p>
+  <ul class="ul">
+    <li>SSE messages are instant (sub-second delivery)</li>
+    <li>Poll messages catch anything missed by SSE (10-second fallback)</li>
+    <li>Multiple messages are batched into a single user message separated by <code>---</code></li>
+    <li>Injected messages appear in the conversation as <code>[INCOMING MESSAGE FROM AGENT]</code>,
+        giving Claude the context to respond to sub-agent reports mid-workflow</li>
+  </ul>
+
+  <div class="h2">3.6 Session Persistence and Resume</div>
+  <p class="p">
+    Each agent maintains a persistent session file (<code>{agent-id}.json</code>) containing the
+    full system prompt and conversation history (all messages as Anthropic SDK <code>MessageParam</code>
+    objects). Sessions are saved after every task completion and on graceful shutdown (SIGINT/SIGTERM).
+  </p>
+  <p class="p">
+    When a project is paused and resumed, the PM agent&rsquo;s container is recreated with the same
+    <code>AGENT_ID</code> environment variable. The new container loads the saved session file,
+    restoring the full conversation history. This allows the PM to continue exactly where it left
+    off, with complete memory of all previous interactions, decisions, and sub-agent results.
+  </p>
+  <p class="p">
+    Resume is handled by the backend&rsquo;s <code>Start</code> endpoint: if a project already has
+    a PM agent, it creates a <code>resume</code> launch request instead of a <code>new</code> one,
+    passing the existing agent ID. The spawner resolves the correct workspace path from the project
+    record and passes it to the new container.
+  </p>
+</div>
+
+<div class="page">
+  <div class="h2">3.7 Sub-Agent Auto-Close Protocol</div>
+  <p class="p">
+    Sub-agents implement a graceful completion protocol designed to maximise utility while
+    preventing resource waste:
+  </p>
+  <ol class="ol">
+    <li>Sub-agent completes its initial task and messages the PM with results</li>
+    <li>Enters a 5-minute wait loop, checking both SSE and polling every 5 seconds</li>
+    <li>If the PM sends follow-up work (questions, revisions, new tasks), the sub-agent processes
+        it and re-enters the wait loop</li>
+    <li>If no follow-up arrives within 5 minutes, the agent uploads remaining files, posts a
+        completion update with cost summary, calls <code>close_agent</code> on itself, and exits</li>
+  </ol>
+  <p class="p">
+    This design gives the PM a generous window to review output and have multi-round
+    conversations with sub-agents before they shut down, while ensuring that idle containers
+    don&rsquo;t accumulate indefinitely.
+  </p>
+
+  <div class="h2">3.8 Container Spawner Design</div>
+  <p class="p">
+    The spawner (<code>services/spawner.go</code>) uses a channel-driven architecture for
+    zero-latency container launches:
+  </p>
+  <ul class="ul">
+    <li>A buffered channel (<code>chan int64</code>, capacity 100) receives launch request IDs</li>
+    <li>A single goroutine processes requests sequentially from the channel</li>
+    <li>When a route creates a launch request, it calls <code>spawner.Notify(requestID)</code>,
+        which pushes the ID to the channel non-blocking</li>
+    <li>The spawner goroutine claims the request (sets status to &ldquo;claimed&rdquo;),
+        assembles Docker run arguments, executes <code>docker run -d</code>, and marks
+        the request completed or failed</li>
+    <li>On startup, any pending requests from before a crash/restart are re-queued</li>
+    <li>A separate health-check goroutine polls Docker every 2 minutes for crashed containers</li>
+  </ul>
+  <p class="p">
+    Docker arguments are constructed dynamically based on the launch request metadata, settings
+    from the database, and project context. Key mounts include the workspace directory and
+    OAuth credentials file (read-only). Resource limits (memory and CPU) are configurable via
+    the settings API, defaulting to 2GB RAM and 1 CPU core per container.
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: KEY TECHNICAL DECISIONS                                      -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">4. Key Technical Decisions</div>
+
+  <div class="h2">4.1 Why Go for Backend and Agent CLI</div>
+  <p class="p">
+    The original prototype was Node.js. The rewrite to Go was motivated by:
+  </p>
+  <ul class="ul">
+    <li><strong>Single binary deployment</strong> &mdash; both the backend server and agent CLI compile
+        to single static binaries. The agent CLI is ~8MB and requires no runtime dependencies, making
+        the base container image just 49MB (Alpine + bash + curl + git + jq + agent-cli).</li>
+    <li><strong>Cross-compilation</strong> &mdash; <code>images/build.sh</code> compiles the agent CLI
+        in a <code>golang:1.24-alpine</code> container with <code>-ldflags='-s -w'</code> for minimal
+        binary size. The same binary runs in all 7 container images.</li>
+    <li><strong>Concurrency model</strong> &mdash; goroutines are ideal for the spawner loop, SSE broker,
+        health checker, and backup scheduler. The channel-based spawner design is idiomatic Go.</li>
+    <li><strong>Memory efficiency</strong> &mdash; a Node.js agent runtime would add ~80MB per container.
+        The Go binary adds ~8MB, enabling the 49MB base image that makes it practical to run
+        4-8 simultaneous agents on a laptop.</li>
+    <li><strong>Type safety for API</strong> &mdash; the Anthropic Go SDK provides typed message
+        construction and response parsing, reducing the risk of malformed API calls.</li>
+  </ul>
+
+  <div class="h2">4.2 Why SQLite (Not Postgres)</div>
+  <ul class="ul">
+    <li><strong>Zero-ops deployment</strong> &mdash; no separate database container. The SQLite file lives
+        in a Docker volume (<code>cam-data</code>), persisting across backend rebuilds.</li>
+    <li><strong>Single-writer workload</strong> &mdash; agent updates arrive sequentially from HTTP handlers;
+        there is no concurrent write contention that would benefit from Postgres.</li>
+    <li><strong>WAL mode performance</strong> &mdash; enables concurrent reads (dashboard queries) while
+        writes are in progress, sufficient for the single-server deployment model.</li>
+    <li><strong>Portable backups</strong> &mdash; the backup scheduler simply copies the database file.
+        WAL checkpoint + truncate is called on graceful shutdown.</li>
+    <li><strong>Embedded triggers</strong> &mdash; SQLite triggers maintain denormalized counters
+        (pending_message_count, unread_update_count) without application-level cache invalidation.</li>
+  </ul>
+
+  <div class="h2">4.3 Why Custom Agent CLI (Not Claude CLI npm Package)</div>
+  <p class="p">
+    Anthropic provides an official Claude CLI as an npm package. The custom agent CLI was built instead for:
+  </p>
+  <ul class="ul">
+    <li><strong>Dashboard integration</strong> &mdash; the CLI needs to register with the backend, stream
+        thinking and tool calls, handle relay messages, manage file uploads, and respond to close
+        signals. None of this exists in the official CLI.</li>
+    <li><strong>PM tool restriction</strong> &mdash; the whitelist enforcement is deeply integrated into the
+        agentic loop. PM agents see a filtered tool list and get runtime rejection of blocked tools.</li>
+    <li><strong>Inter-turn message injection</strong> &mdash; the ability to drain SSE and poll channels between
+        API calls and inject messages into the conversation is fundamental to PM interruptibility.</li>
+    <li><strong>Container size</strong> &mdash; the npm CLI requires Node.js (~80MB), plus npm install of the
+        package and its dependencies. The Go binary is 8MB with zero dependencies.</li>
+    <li><strong>OAuth bridge auth</strong> &mdash; the custom auth flow reads
+        <code>.credentials.json</code>, creates a code session, and acquires a bridge worker JWT.
+        This works with existing Claude subscriptions without requiring a separate API key.</li>
+    <li><strong>Session persistence format</strong> &mdash; sessions are stored as JSON-serialized
+        Anthropic SDK <code>MessageParam</code> arrays, enabling exact conversation resumption.</li>
+  </ul>
+</div>
+
+<div class="page">
+  <div class="h2">4.4 Why SSE (Not WebSocket)</div>
+  <p class="p">
+    Server-Sent Events was chosen over WebSocket for the initial implementation:
+  </p>
+  <ul class="ul">
+    <li><strong>Simpler infrastructure</strong> &mdash; SSE uses standard HTTP, works through all proxies
+        and load balancers without special configuration. The SSE broker is ~120 lines of Go.</li>
+    <li><strong>Primarily unidirectional</strong> &mdash; the dominant data flow is server-to-client
+        (agent updates streaming to dashboard). The rare client-to-server flows (user messages,
+        relay requests) are adequately served by REST endpoints.</li>
+    <li><strong>Automatic reconnection</strong> &mdash; the browser&rsquo;s <code>EventSource</code> API
+        handles reconnection natively. The frontend SSE provider adds a 3-second backoff. The agent
+        CLI SSE client implements exponential backoff up to 30 seconds.</li>
+    <li><strong>Limitations accepted</strong> &mdash; SSE&rsquo;s lack of bidirectional communication means
+        the frontend cannot push messages to agents without a REST call. This is a known limitation
+        that WebSocket would address in a future version.</li>
+  </ul>
+
+  <div class="h2">4.5 Why Container-Per-Agent (Not Threads/Processes)</div>
+  <p class="p">
+    Each agent runs in its own Docker container, rather than as a thread or process within the
+    backend:
+  </p>
+  <ul class="ul">
+    <li><strong>Tooling isolation</strong> &mdash; a data science agent needs pandas/scipy/matplotlib;
+        a web agent needs Playwright/Chromium; a Go agent needs the Go compiler. These cannot
+        coexist in a single process without bloating the base image to multi-gigabyte sizes.</li>
+    <li><strong>Resource limits</strong> &mdash; Docker provides per-container memory and CPU limits
+        (configurable, default 2GB/1 CPU). A runaway agent cannot starve others.</li>
+    <li><strong>Crash isolation</strong> &mdash; if an agent crashes (OOM, infinite loop, tool error),
+        only that container dies. The backend detects this via the health checker and broadcasts
+        a <code>container-health</code> event.</li>
+    <li><strong>Security boundary</strong> &mdash; agents run as non-root users with read-only credential
+        mounts. The workspace is the only writable mount. Agents cannot access each other&rsquo;s
+        containers or the backend&rsquo;s database.</li>
+    <li><strong>Clean state</strong> &mdash; each container starts fresh (no process-level state leaks).
+        The only persistence is the session file in the workspace and the messages in the database.</li>
+  </ul>
+
+  <div class="h2">4.6 OAuth Bridge Discovery for Enterprise Accounts</div>
+  <p class="p">
+    The authentication system supports two paths:
+  </p>
+  <ol class="ol">
+    <li><strong>Direct API Key</strong> &mdash; set <code>ANTHROPIC_API_KEY</code> environment variable.
+        Simplest path, used for API-billed accounts.</li>
+    <li><strong>OAuth Bridge</strong> &mdash; reads the OAuth access token from
+        <code>~/.claude/.credentials.json</code> (the same file the VS Code extension and official
+        Claude CLI write to), creates a code session via <code>POST /v1/code/sessions</code>,
+        then acquires a bridge worker via <code>POST /v1/code/sessions/{id}/bridge</code>.
+        The bridge response provides a <code>worker_jwt</code> and <code>api_base_url</code>
+        that are used with the Anthropic SDK&rsquo;s <code>WithAuthToken</code> and
+        <code>WithBaseURL</code> options.</li>
+  </ol>
+  <p class="p">
+    The OAuth bridge tokens expire periodically. The client implements automatic re-authentication:
+    when an API call returns 401 or &ldquo;expired token&rdquo;, it calls <code>authenticate()</code>
+    again to acquire a fresh bridge session, then retries the request. This is transparent to the
+    agentic loop.
+  </p>
+  <p class="p">
+    This design means users with Claude Pro, Team, or Enterprise subscriptions can use Claude
+    Projects without purchasing separate API credits. The bridge routes requests through the
+    same billing as the official Claude CLI.
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: CURRENT CAPABILITIES                                         -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">5. Current Capabilities</div>
+
+  <div class="h2">5.1 The 162-Role Agent Library</div>
+  <p class="p">
+    The system ships with a library of 162 pre-defined specialist roles, embedded as a JSON file
+    via Go&rsquo;s <code>go:embed</code> directive. Each role contains:
+  </p>
+  <ul class="ul">
+    <li><strong>ID</strong> &mdash; hyphenated identifier (e.g. <code>engineering-backend-architect</code>)</li>
+    <li><strong>Name</strong> &mdash; human-readable label (e.g. &ldquo;Backend Architect&rdquo;)</li>
+    <li><strong>Category</strong> &mdash; grouping for UI display (Engineering, Testing, Marketing, etc.)</li>
+    <li><strong>Description</strong> &mdash; one-line description of the role&rsquo;s expertise</li>
+    <li><strong>Vibe</strong> &mdash; personality/communication style descriptor</li>
+    <li><strong>Suggested Image</strong> &mdash; recommended container image for this role</li>
+    <li><strong>System Prompt</strong> &mdash; multi-paragraph expert system prompt that shapes the
+        agent&rsquo;s behaviour, knowledge, and communication style</li>
+  </ul>
+  <p class="p">
+    Image overrides are applied at load time: certain roles are mapped to specialised containers
+    (e.g. data roles &rarr; <code>claude-agent-data</code>, web testing roles &rarr;
+    <code>claude-agent-web</code>, Go development &rarr; <code>claude-agent-go</code>).
+  </p>
+  <p class="p">
+    The PM agent accesses the library via the <code>search_roles</code> tool, which performs
+    keyword matching against role names, descriptions, and categories. This allows the PM to
+    discover specialists dynamically based on project needs rather than relying on a fixed set.
+  </p>
+
+  <div class="h2">5.2 PM Strategic Decision-Making</div>
+  <p class="p">
+    The PM agent&rsquo;s effectiveness is shaped by its system prompt, which enforces
+    several strategic behaviours:
+  </p>
+  <ul class="ul">
+    <li><strong>Read-React-Adapt</strong> &mdash; after every agent completes, the PM must read the output
+        file (via <code>read_file</code>) and make a strategic decision before spawning the next agent.
+        This prevents linear plan execution and forces information-driven adaptation.</li>
+    <li><strong>Multi-Round Conversations</strong> &mdash; the PM is instructed to have 2-3 exchanges with
+        each agent: challenge weak parts, ask for specifics, request rewrites. The
+        <code>relay_message</code> tool with <code>wait_for_reply=true</code> enables synchronous
+        back-and-forth.</li>
+    <li><strong>Timeline Narration</strong> &mdash; the PM posts decisions and reasoning to the project
+        timeline via <code>post_update</code>, giving the user visibility into why agents were spawned,
+        what was learned, and how the plan is evolving.</li>
+    <li><strong>Retry Discipline</strong> &mdash; maximum 3 attempts per task, tracked via scratchpad.
+        If a task fails repeatedly, the PM posts an error and moves on rather than wasting resources.</li>
+    <li><strong>Completion Verification</strong> &mdash; before marking a project complete, the PM must
+        use <code>list_files</code> and <code>read_file</code> to verify all deliverables exist and
+        meet quality standards.</li>
+  </ul>
+</div>
+
+<div class="page">
+  <div class="h2">5.3 Real-Time Activity Streaming</div>
+  <p class="p">
+    Every agent action is streamed to the dashboard in real time via the update posting mechanism:
+  </p>
+  <ul class="ul">
+    <li><strong>Thinking</strong> &mdash; mid-turn text responses (during tool_use stop reasons) are posted
+        as <code>thinking</code> updates, truncated to 500 characters. These appear as violet cards
+        in the timeline, showing the agent&rsquo;s reasoning process.</li>
+    <li><strong>Tool calls</strong> &mdash; every tool invocation is posted as a <code>tool</code> update
+        with the tool name as summary and the JSON input as content. The frontend parses the JSON
+        to show contextual summaries (file paths, bash commands, search queries, relay targets).</li>
+    <li><strong>Completion</strong> &mdash; task completion posts include a structured JSON body with the
+        output text (truncated to 5000 chars), list of changed files, token counts, and estimated
+        cost in USD.</li>
+    <li><strong>Errors</strong> &mdash; API failures, tool errors, and iteration limit exceeded are posted
+        as <code>error</code> updates with full error messages.</li>
+  </ul>
+  <p class="p">
+    The rate limiter allows up to 600 updates per minute per agent, ensuring that high-frequency
+    tool calling (e.g. a coding agent running many bash commands) doesn&rsquo;t get throttled.
+  </p>
+
+  <div class="h2">5.4 PrintingPress PDF Generation</div>
+  <p class="p">
+    The <code>claude-agent-printingpress</code> image bundles the PrintingPress PDF generation
+    system, enabling agents to produce professional branded documents. The PM system prompt
+    includes instructions for the PrintingPress API:
+  </p>
+  <ul class="ul">
+    <li>Agent creates a Python script that imports <code>build_document</code> from
+        <code>/opt/printingpress/build.py</code></li>
+    <li>Content is authored as HTML using PrintingPress CSS component classes
+        (<code>.h1</code>, <code>.h2</code>, <code>.p</code>, <code>.table</code>, etc.)</li>
+    <li>The script calls <code>build_document(title, subtitle, brand, content_html, output_name, output_dir)</code></li>
+    <li>WeasyPrint renders the HTML+CSS to a PDF with branded covers, headers, footers,
+        and page numbers</li>
+    <li>Available brands: <strong>Reach</strong> (navy corporate) and <strong>Lumi</strong>
+        (blue-purple gradient product)</li>
+  </ul>
+
+  <div class="h2">5.5 Project Workspace Isolation</div>
+  <p class="p">
+    Every project gets its own subdirectory within the configured workspace root. When agents
+    are spawned, the spawner resolves the host path as
+    <code>{workspace_root}/{project_folder_path}</code> and bind-mounts it to
+    <code>/workspace</code> in the container. This means:
+  </p>
+  <ul class="ul">
+    <li>All agents in a project share the same filesystem view</li>
+    <li>Agents can read each other&rsquo;s output files directly</li>
+    <li>Sub-agents cannot access other projects&rsquo; workspaces</li>
+    <li>The user can inspect all deliverables in the project folder on the host</li>
+    <li>Git operations (if the workspace is a repository) are shared across agents</li>
+  </ul>
+
+  <div class="h2">5.6 Token Tracking and Cost Estimation</div>
+  <p class="p">
+    The agent CLI tracks cumulative input and output tokens using atomic counters. After every
+    API call, it logs token counts and estimates cost based on the model&rsquo;s pricing:
+  </p>
+  <table class="table">
+    <tr>
+      <th>Model</th>
+      <th>Input (per M tokens)</th>
+      <th>Output (per M tokens)</th>
+    </tr>
+    <tr>
+      <td>Claude Haiku 4.5</td>
+      <td>$1.00</td>
+      <td>$5.00</td>
+    </tr>
+    <tr>
+      <td>Claude Sonnet 4.6</td>
+      <td>$3.00</td>
+      <td>$15.00</td>
+    </tr>
+    <tr>
+      <td>Claude Opus 4.6</td>
+      <td>$5.00</td>
+      <td>$25.00</td>
+    </tr>
+  </table>
+  <p class="p">
+    Cost estimates are included in task completion updates and the auto-close message.
+    From test runs, PM agents typically cost $18&ndash;20 per project (dominated by context
+    growth over 130+ conversation turns), while sub-agents cost $0.25&ndash;$1 each. A full
+    project run producing 45 deliverables costs approximately $25&ndash;30.
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: KNOWN LIMITATIONS & IMPROVEMENT AREAS                        -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">6. Known Limitations and Improvement Areas</div>
+  <p class="p">
+    This section documents known issues and planned improvements across three dimensions:
+    user experience, technical infrastructure, and architectural design.
+  </p>
+
+  <div class="h2">6.1 UX/UI Improvements</div>
+
+  <div class="h3">Timeline Ordering</div>
+  <p class="p">
+    The unified timeline sorts entries by timestamp, but inconsistencies between server-generated
+    timestamps (UTC) and client-parsed timestamps can cause ordering anomalies. Updates from
+    different agents may interleave in unexpected ways. The timeline should behave as a
+    chronological chat-style feed where the most recent activity always appears at the bottom.
+  </p>
+
+  <div class="h3">PM Agent Page</div>
+  <p class="p">
+    The PM agent&rsquo;s detail page currently shows its own thinking and tool calls, but does
+    not aggregate the project timeline. Since the PM is the project&rsquo;s orchestrator, its
+    page should show a merged view of project-level events, sub-agent status changes, and the
+    PM&rsquo;s own activity &mdash; essentially the same view as the project page.
+  </p>
+
+  <div class="h3">No WebSocket (SSE Only)</div>
+  <p class="p">
+    SSE is server-to-client only. User messages sent from the dashboard require a REST call,
+    introducing a round-trip that WebSocket would eliminate. More importantly, the dashboard
+    cannot push real-time feedback to the PM (e.g. &ldquo;pause this agent&rdquo; or &ldquo;focus
+    on the IVF vertical&rdquo;) without the PM polling for messages.
+  </p>
+
+  <div class="h3">Page Refresh Requirements</div>
+  <p class="p">
+    Some state changes (particularly agent linking to projects after spawn) require a page
+    refresh to appear in the dashboard. The SSE event system covers most updates, but there are
+    gaps in event coverage for certain state transitions.
+  </p>
+
+  <div class="h3">No Notification System</div>
+  <p class="p">
+    When a project completes or an agent requires user input (via <code>ask_user</code>), there
+    is no notification mechanism other than the user watching the dashboard. Web Push subscription
+    endpoints exist in the API but are not fully integrated into the frontend.
+  </p>
+
+  <div class="h3">Mobile Responsiveness</div>
+  <p class="p">
+    The dashboard has not been tested or optimised for mobile viewports. While Tailwind CSS
+    provides responsive utilities, no mobile-specific layouts have been implemented.
+  </p>
+</div>
+
+<div class="page">
+  <div class="h2">6.2 Technical Improvements</div>
+
+  <div class="h3">PM Conversation Quality</div>
+  <p class="p">
+    The most significant functional limitation. Despite the system prompt&rsquo;s instructions,
+    the PM agent tends toward linear plan execution rather than adaptive strategy. Symptoms:
+  </p>
+  <ul class="ul">
+    <li>PM builds a rigid plan at project start and executes it sequentially</li>
+    <li>Agent findings rarely change the PM&rsquo;s subsequent decisions</li>
+    <li>Multi-round conversations (PM asking follow-up questions) happen inconsistently</li>
+    <li>Output tends toward volume (&ldquo;554 pages of sophisticated filler&rdquo;) rather than
+        focused quality (&ldquo;15 pages of killer strategy&rdquo;)</li>
+  </ul>
+  <p class="p">
+    This is fundamentally a prompt engineering and conversation architecture challenge. The
+    message injection mechanism works &mdash; messages arrive between turns &mdash; but the PM
+    does not consistently react to them with strategic depth. Potential mitigations include
+    structured phase gates, mandatory read-then-decide checkpoints, and example conversations
+    in the system prompt.
+  </p>
+
+  <div class="h3">Sub-Agent Completion Protocol</div>
+  <p class="p">
+    The auto-close timer (5 minutes) creates a tension: long enough for the PM to review and
+    respond, but sometimes the PM is mid-turn when a sub-agent times out. The PM then tries to
+    message a closed agent, gets an error, and may retry unnecessarily. A more robust protocol
+    would have the PM explicitly acknowledge receipt of a sub-agent&rsquo;s report, resetting the
+    timeout.
+  </p>
+
+  <div class="h3">No Automated Testing</div>
+  <p class="p">
+    The codebase has no unit tests, integration tests, or end-to-end tests. Given the complexity
+    of the spawner, relay messaging, session persistence, and PM tool restriction logic, this is
+    a significant risk for regressions during development. The monolithic agent CLI is particularly
+    difficult to test without dependency injection.
+  </p>
+
+  <div class="h3">No CI/CD Pipeline</div>
+  <p class="p">
+    There is no automated build, test, or deployment pipeline. Agent images must be rebuilt
+    manually via <code>images/build.sh</code> after any change to the agent CLI. The backend
+    and frontend are built by Docker Compose on <code>docker compose up --build</code>.
+  </p>
+
+  <div class="h3">Manual Image Rebuilds</div>
+  <p class="p">
+    After modifying any file in <code>backend/cmd/agent-cli/</code>, all 7 agent images must be
+    rebuilt because they share the same compiled binary. The build script handles this
+    (cross-compile once, copy to all), but it must be run manually.
+  </p>
+
+  <div class="h3">Database Migration Limitations</div>
+  <p class="p">
+    Migrations are additive-only (ADD COLUMN). There is no version tracking, no rollback
+    capability, and no support for column removal or type changes. The schema table recreation
+    (for removing CHECK constraints) is a one-off workaround, not a generalised migration system.
+  </p>
+
+  <div class="h3">No Rate Limiting for API Costs</div>
+  <p class="p">
+    There is no per-project or per-agent budget limit. A PM agent with a concurrency limit of 4
+    could spawn agents indefinitely (closing old ones to free slots), potentially running up
+    significant Anthropic API costs. Token counters exist in the agent CLI but are not persisted
+    to the database or aggregated at the project level.
+  </p>
+
+  <div class="h3">Token Counter Persistence</div>
+  <p class="p">
+    Token counts use in-memory atomic counters that are lost when the container exits. The
+    completion update includes the final token count, but there is no cumulative project-level
+    cost tracking in the database.
+  </p>
+</div>
+
+<div class="page">
+  <div class="h2">6.3 Architectural Improvements</div>
+
+  <div class="h3">Domain Service Layer</div>
+  <p class="p">
+    HTTP handlers currently contain business logic (e.g. <code>projects.go Start()</code>
+    generates PM prompts, creates launch requests, and manages project state transitions).
+    A dedicated service layer would separate HTTP concerns from business rules, enabling
+    reuse (e.g. starting a project from a workflow or API without going through HTTP) and
+    making the code testable without HTTP mocking.
+  </p>
+
+  <div class="h3">No Dependency Injection</div>
+  <p class="p">
+    Services are instantiated directly in <code>main.go</code> and passed to route constructors.
+    The agent CLI uses package-level globals (<code>activeDashboard</code>,
+    <code>activeSSE</code>). This makes unit testing impractical &mdash; you cannot inject
+    mock implementations of the SSE client, dashboard client, or Anthropic client.
+  </p>
+
+  <div class="h3">Agent CLI Monolith</div>
+  <p class="p">
+    The agent CLI is a single Go package (<code>cmd/agent-cli/</code>) where the agentic loop,
+    tool definitions, tool implementations, session management, dashboard client, SSE client,
+    and authentication are all in the same package. Splitting into separate packages (e.g.
+    <code>loop</code>, <code>tools</code>, <code>comms</code>, <code>auth</code>) would improve
+    testability and readability.
+  </p>
+
+  <div class="h3">WebSocket for Bidirectional Communication</div>
+  <p class="p">
+    WebSocket would enable:
+  </p>
+  <ul class="ul">
+    <li>Real-time user messages to agents without REST round-trips</li>
+    <li>Streaming token-by-token output (currently only post-turn summaries)</li>
+    <li>Bidirectional health pings between agents and backend</li>
+    <li>Push-based agent lifecycle commands (pause, resume, cancel) without polling</li>
+  </ul>
+
+  <div class="h3">gRPC Between Backend and Agents</div>
+  <p class="p">
+    The current REST+SSE communication between agents and the backend could be replaced with
+    gRPC for:
+  </p>
+  <ul class="ul">
+    <li>Typed message contracts (protobuf) instead of ad-hoc JSON</li>
+    <li>Bidirectional streaming for real-time activity feeds</li>
+    <li>Multiplexed connections (single TCP connection per agent)</li>
+    <li>Automatic retry and deadline propagation</li>
+  </ul>
+  <p class="p">
+    However, gRPC would add complexity to the Docker networking setup (agents currently use
+    <code>host.docker.internal</code> for HTTP, which is simpler than configuring gRPC service
+    discovery) and would not provide immediate user-facing benefits.
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 7: DEPLOYMENT AND OPERATIONS                                    -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">7. Deployment and Operations</div>
+
+  <div class="h2">7.1 Docker Compose Configuration</div>
+  <p class="p">
+    The system deploys via a minimal <code>docker-compose.yml</code> with two services:
+  </p>
+  <table class="table">
+    <tr>
+      <th style="width:15%">Service</th>
+      <th style="width:12%">Port</th>
+      <th style="width:73%">Configuration</th>
+    </tr>
+    <tr>
+      <td><code>cam</code></td>
+      <td>9222</td>
+      <td>Backend Go server. Mounts: <code>cam-data</code> volume for SQLite, Docker socket for
+          container spawning, workspace root (read-only for file browsing). Restart policy:
+          <code>unless-stopped</code>.</td>
+    </tr>
+    <tr>
+      <td><code>frontend</code></td>
+      <td>4173</td>
+      <td>Next.js dashboard. Environment: <code>NEXT_PUBLIC_API_URL=http://localhost:9222</code>.
+          Depends on <code>cam</code> service. Restart policy: <code>unless-stopped</code>.</td>
+    </tr>
+  </table>
+  <p class="p">
+    The backend container has Docker socket access (<code>/var/run/docker.sock</code>), which
+    allows it to spawn and manage agent containers. This is the mechanism that gives the backend
+    control over the agent fleet without requiring a separate orchestrator (Kubernetes, Docker
+    Swarm, etc.).
+  </p>
+
+  <div class="h2">7.2 Setup Wizard</div>
+  <p class="p">
+    On first launch, the frontend detects that setup is incomplete (via
+    <code>GET /api/settings/setup-status</code>) and presents a setup wizard that configures:
+  </p>
+  <ul class="ul">
+    <li><strong>Claude Config Path</strong> &mdash; path to the directory containing
+        <code>.claude/.credentials.json</code> on the host, used for OAuth auth mount</li>
+    <li><strong>Workspace Root</strong> &mdash; host directory where project folders are created</li>
+    <li><strong>Agent Memory Limit</strong> &mdash; per-container RAM limit (default: 2GB)</li>
+    <li><strong>Agent CPU Limit</strong> &mdash; per-container CPU limit (default: 1 core)</li>
+    <li><strong>Max Concurrent Agents</strong> &mdash; global limit (default: 8)</li>
+    <li><strong>Default Agent Image</strong> &mdash; default container image (default: <code>claude-agent</code>)</li>
+  </ul>
+
+  <div class="h2">7.3 Build Process</div>
+  <p class="p">
+    A full deployment involves three build steps:
+  </p>
+  <ol class="ol">
+    <li><strong>Agent images</strong> &mdash; <code>bash images/build.sh</code> cross-compiles the
+        agent CLI binary in a Go container, then builds all 7 Docker images. Each image copies the
+        pre-compiled binary and adds its specific dependencies.</li>
+    <li><strong>Backend + Frontend</strong> &mdash; <code>docker compose up -d --build</code> builds the
+        backend Go server (multi-stage Dockerfile) and the Next.js frontend, then starts both services.</li>
+    <li><strong>Setup</strong> &mdash; first visit to <code>http://localhost:4173</code> triggers the
+        setup wizard for credential paths and workspace configuration.</li>
+  </ol>
+
+  <div class="h2">7.4 Graceful Shutdown</div>
+  <p class="p">
+    The backend implements graceful shutdown on SIGINT/SIGTERM:
+  </p>
+  <ol class="ol">
+    <li>Broadcasts a <code>shutdown</code> SSE event so agents know to reconnect, not exit</li>
+    <li>HTTP server shutdown with 20-second timeout for in-flight requests</li>
+    <li>SQLite WAL checkpoint and truncate to ensure database consistency</li>
+    <li>Database connection close</li>
+  </ol>
+  <p class="p">
+    Agent containers survive backend restarts because they reconnect via SSE with exponential
+    backoff. The SSE client treats a <code>shutdown</code> event as a signal to reconnect rather
+    than terminate, maintaining agent session continuity across backend deployments.
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 8: TEST RESULTS AND PRODUCTION EXPERIENCE                       -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">8. Test Results and Production Experience</div>
+
+  <div class="h2">8.1 ICP Campaign Test Run</div>
+  <p class="p">
+    The first full production test was a Lumi ICP (Ideal Customer Profile) campaign project.
+    Results:
+  </p>
+  <table class="table">
+    <tr>
+      <th style="width:30%">Metric</th>
+      <th style="width:70%">Result</th>
+    </tr>
+    <tr>
+      <td>Total agents spawned</td>
+      <td>~15 specialist agents across multiple phases</td>
+    </tr>
+    <tr>
+      <td>Files produced</td>
+      <td>45 files, 960KB total</td>
+    </tr>
+    <tr>
+      <td>Run time</td>
+      <td>~40 minutes</td>
+    </tr>
+    <tr>
+      <td>PM cost</td>
+      <td>~$18&ndash;20 (130+ conversation turns)</td>
+    </tr>
+    <tr>
+      <td>Sub-agent cost (each)</td>
+      <td>$0.25&ndash;$1</td>
+    </tr>
+    <tr>
+      <td>Total run cost</td>
+      <td>~$25&ndash;30</td>
+    </tr>
+  </table>
+
+  <div class="h3">What Worked</div>
+  <ul class="ul">
+    <li>162-role library loaded and served correctly via API</li>
+    <li>Role picker UI functional in the dashboard</li>
+    <li>Agents successfully writing files to the shared workspace</li>
+    <li><code>max_tokens</code> continuation (agents no longer stop mid-write)</li>
+    <li>Sub-agent auto-close with file uploads</li>
+    <li>Workspace file browser accessible from the dashboard</li>
+    <li>PM resume without creating duplicate agents</li>
+    <li>Archived agents collapsed in UI to reduce clutter</li>
+    <li>Timeline timestamps displaying correctly</li>
+  </ul>
+
+  <div class="h3">Issues Discovered</div>
+  <ul class="ul">
+    <li>PM executed a linear plan without reacting to agent findings</li>
+    <li>PM did not have genuine back-and-forth conversations with agents</li>
+    <li>Output was high-volume but low-quality (554 pages of broad coverage vs 15 pages of focused strategy)</li>
+    <li>Some agents overwrote sibling agents&rsquo; output files</li>
+    <li>Agent-to-project linking failed for later-spawned agents (timing issue, since fixed)</li>
+    <li>PM could not see agents via <code>list_project_agents</code> due to linking failure</li>
+  </ul>
+
+  <div class="h2">8.2 Code Review Findings</div>
+  <p class="p">
+    A comprehensive code review of the codebase identified:
+  </p>
+  <table class="table">
+    <tr>
+      <th>Component</th>
+      <th>Critical</th>
+      <th>High</th>
+      <th>Total</th>
+    </tr>
+    <tr>
+      <td>Backend</td>
+      <td class="td-red">4</td>
+      <td class="td-amber">10</td>
+      <td>43</td>
+    </tr>
+    <tr>
+      <td>Frontend</td>
+      <td class="td-red">3</td>
+      <td class="td-amber">5</td>
+      <td>28</td>
+    </tr>
+  </table>
+
+  <div class="h3">Critical Backend Issues</div>
+  <ul class="ul">
+    <li>SQL injection in <code>GetDistinctAgentIDs</code> (user input concatenated into query)</li>
+    <li>Nil pointer panic in <code>relay_message</code> when dashboard client is nil</li>
+    <li>Nil pointer panic in <code>tools_schedule</code></li>
+    <li>Race condition on atomic token counters (read-then-update not atomic)</li>
+  </ul>
+
+  <div class="h3">Critical Frontend Issues</div>
+  <ul class="ul">
+    <li>XSS vulnerability via <code>dangerouslySetInnerHTML</code> in the timeline
+        (since mitigated with HTML entity escaping)</li>
+    <li>API key exposed in SSE URL query parameter (visible in browser dev tools and server logs)</li>
+    <li>Unauthenticated key endpoint (<code>GET /api/auth/key</code> returns the API key without auth)</li>
+  </ul>
+</div>
+
+<div class="page">
+  <div class="h2">8.3 Fixes Applied Across Test Sessions</div>
+  <p class="p">
+    Multiple test-fix-test cycles addressed the most impactful issues:
+  </p>
+
+  <div class="h3">Session 1 Fixes</div>
+  <ul class="ul">
+    <li>System prompt separation: PM prompt as system, user description as first user message</li>
+    <li>Agent title propagation from role name instead of generic &ldquo;Container Agent&rdquo;</li>
+    <li>File upload on task completion (auto-upload changed files)</li>
+    <li>Workspace file browser working after mount path resolution fix</li>
+  </ul>
+
+  <div class="h3">Session 2 Fixes</div>
+  <ul class="ul">
+    <li>Tool and thinking streaming to timeline (CHECK constraint on <code>updates.type</code>
+        was blocking new types &mdash; table recreated without constraint)</li>
+    <li>PM restricted to orchestration-only tools (13-tool whitelist with double enforcement)</li>
+    <li>Sub-agent auto-close after 5-minute idle window</li>
+    <li>SSE reconnect on dashboard restart (agents survive via reconnect loop)</li>
+    <li>Agent linking fixed (project_id, role, parent_agent_id sent as env vars instead of
+        fragile launch request matching)</li>
+    <li>New Next.js frontend with unified timeline, auth gate, SSE provider</li>
+    <li>Rate limiter increased to 600/min for streaming-heavy agents</li>
+    <li>XSS mitigation via HTML entity escaping in <code>FormattedText</code> component</li>
+    <li>Continuous conversation mode for PM (messages feed into same session, not isolated tasks)</li>
+    <li>Inter-turn message injection (SSE + poll drain between API calls)</li>
+  </ul>
+
+  <div class="h2">8.4 The Fundamental Challenge</div>
+  <p class="p">
+    The core remaining challenge is not infrastructure but intelligence. The system reliably
+    spawns agents, delivers messages, streams activity, and manages lifecycles. But the PM
+    agent&rsquo;s strategic behaviour &mdash; reading output, adapting plans, making hard calls,
+    and having genuine multi-round conversations &mdash; is inconsistent.
+  </p>
+  <p class="p">
+    This is a prompt engineering challenge at the frontier of what current models can do
+    reliably. The PM needs to:
+  </p>
+  <ol class="ol">
+    <li><strong>Read and react</strong> &mdash; change plans based on what agents discover</li>
+    <li><strong>Make hard calls</strong> &mdash; choose 1-2 directions instead of covering everything</li>
+    <li><strong>Have real conversations</strong> &mdash; reject weak work, request specifics, iterate</li>
+    <li><strong>Build on findings</strong> &mdash; later agents should use earlier agents&rsquo; discoveries</li>
+    <li><strong>Cut ruthlessly</strong> &mdash; final output should be focused and actionable, not comprehensive</li>
+  </ol>
+  <p class="p">
+    The test for success: does the PM change its plan based on what agents discover? If yes,
+    the system is working as designed. If no, the orchestration is still mechanical rather
+    than intelligent.
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 9: FUTURE ROADMAP                                               -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">9. Future Roadmap</div>
+
+  <div class="h2">9.1 V2 Architecture</div>
+  <p class="p">
+    The following architectural changes are planned for the next major version:
+  </p>
+
+  <div class="h3">WebSocket Integration</div>
+  <p class="p">
+    Replace SSE with WebSocket for bidirectional real-time communication. This enables:
+    real-time user messages to agents, streaming token-by-token output, push-based lifecycle
+    commands, and bidirectional health monitoring. The SSE provider in the frontend would be
+    replaced with a WebSocket provider maintaining a single multiplexed connection.
+  </p>
+
+  <div class="h3">Interruptible PM Loop</div>
+  <p class="p">
+    The PM&rsquo;s agentic loop should be concurrent with message handling at the model level,
+    not just at the turn boundary. Sub-agent completion messages should be able to interrupt the
+    PM&rsquo;s current API call (by injecting into a pending request&rsquo;s context), not wait
+    for the current turn to complete. This would make conversations more natural and reduce
+    the delay between sub-agent completion and PM reaction.
+  </p>
+
+  <div class="h3">Service Layer Extraction</div>
+  <p class="p">
+    Extract business logic from HTTP handlers into a domain service layer. The project start
+    flow (PM prompt generation, launch request creation, project state transition) should be a
+    single service method callable from HTTP handlers, workflow engine, and future gRPC endpoints.
+  </p>
+
+  <div class="h3">Dependency Injection</div>
+  <p class="p">
+    Introduce interfaces for all external dependencies (Anthropic client, Docker client,
+    database, SSE broker) and constructor-based injection. This enables unit testing with
+    mock implementations and makes the architecture explicit about its dependencies.
+  </p>
+
+  <div class="h2">9.2 Operational Improvements</div>
+  <ul class="ul">
+    <li><strong>Cost tracking dashboard</strong> &mdash; per-project and per-agent token and cost
+        aggregation, persisted to database, visible in the frontend</li>
+    <li><strong>Budget limits</strong> &mdash; per-project cost caps that pause the PM when exceeded</li>
+    <li><strong>Automated testing</strong> &mdash; unit tests for spawner, relay, session persistence;
+        integration tests for the full spawn-work-report cycle using mock Anthropic responses</li>
+    <li><strong>CI/CD pipeline</strong> &mdash; automated image builds and backend deployment on push</li>
+    <li><strong>Database migration system</strong> &mdash; versioned, reversible migrations with
+        rollback support</li>
+    <li><strong>Notification system</strong> &mdash; Web Push integration for project completion,
+        agent questions, and error alerts</li>
+  </ul>
+
+  <div class="h2">9.3 PM Intelligence</div>
+  <p class="p">
+    The highest-impact improvement area. Approaches under consideration:
+  </p>
+  <ul class="ul">
+    <li><strong>Structured phase gates</strong> &mdash; force the PM to post a
+        &ldquo;Phase N Decision&rdquo; update with explicit reasoning about what was learned and
+        how the plan is changing before spawning the next batch of agents</li>
+    <li><strong>Mandatory output review</strong> &mdash; inject a system-level constraint that the PM
+        must call <code>read_file</code> on every agent&rsquo;s output before spawning any new agent</li>
+    <li><strong>Example conversations</strong> &mdash; include multi-round PM-agent conversation examples
+        in the system prompt to demonstrate the expected depth of interaction</li>
+    <li><strong>Output quality scoring</strong> &mdash; a lightweight self-evaluation step where the PM
+        rates each agent&rsquo;s output on a scale and explains the rating before deciding next steps</li>
+    <li><strong>Smaller context window</strong> &mdash; aggressively summarise old conversation turns to
+        keep the PM&rsquo;s context focused on recent findings rather than the full history</li>
+  </ul>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<!-- SECTION 10: APPENDIX                                                    -->
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+
+<div class="page">
+  <div class="h1">Appendix A: Complete API Endpoint Reference</div>
+  <p class="p">
+    All endpoints are prefixed with <code>/api/</code> and require API key authentication
+    (except health checks and setup status).
+  </p>
+
+  <table class="table">
+    <tr>
+      <th style="width:12%">Method</th>
+      <th style="width:40%">Path</th>
+      <th style="width:48%">Description</th>
+    </tr>
+    <tr><td>GET</td><td>/health</td><td>Server health check</td></tr>
+    <tr><td>GET</td><td>/health/db</td><td>Database integrity check</td></tr>
+    <tr><td>GET</td><td>/events</td><td>SSE event stream</td></tr>
+    <tr><td>GET</td><td>/agents</td><td>List all agents</td></tr>
+    <tr><td>GET</td><td>/agents/analytics</td><td>Agent statistics</td></tr>
+    <tr><td>GET</td><td>/agents/{id}</td><td>Get agent details</td></tr>
+    <tr><td>PATCH</td><td>/agents/{id}</td><td>Update agent fields</td></tr>
+    <tr><td>DELETE</td><td>/agents/{id}</td><td>Delete agent</td></tr>
+    <tr><td>POST</td><td>/agents/{id}/updates</td><td>Post activity update</td></tr>
+    <tr><td>GET</td><td>/agents/{id}/updates</td><td>Get agent timeline</td></tr>
+    <tr><td>POST</td><td>/agents/{id}/messages</td><td>Send message to agent</td></tr>
+    <tr><td>GET</td><td>/agents/{id}/messages</td><td>Get agent messages</td></tr>
+    <tr><td>POST</td><td>/agents/{id}/close</td><td>Archive and close agent</td></tr>
+    <tr><td>POST</td><td>/agents/{id}/resume</td><td>Resume archived agent</td></tr>
+    <tr><td>POST</td><td>/agents/{id}/relay</td><td>Relay message to another agent</td></tr>
+    <tr><td>POST</td><td>/agents/{id}/files</td><td>Upload file</td></tr>
+    <tr><td>GET</td><td>/agents/{id}/files</td><td>List agent files</td></tr>
+    <tr><td>GET</td><td>/agents/{id}/files/{fid}</td><td>Download file</td></tr>
+    <tr><td>GET</td><td>/projects</td><td>List all projects</td></tr>
+    <tr><td>POST</td><td>/projects</td><td>Create project</td></tr>
+    <tr><td>GET</td><td>/projects/{id}</td><td>Get project details</td></tr>
+    <tr><td>PATCH</td><td>/projects/{id}</td><td>Update project</td></tr>
+    <tr><td>DELETE</td><td>/projects/{id}</td><td>Delete project</td></tr>
+    <tr><td>POST</td><td>/projects/{id}/start</td><td>Start or resume project</td></tr>
+    <tr><td>POST</td><td>/projects/{id}/pause</td><td>Pause project</td></tr>
+    <tr><td>POST</td><td>/projects/{id}/complete</td><td>Complete project</td></tr>
+    <tr><td>GET</td><td>/projects/{id}/agents</td><td>Get project agents</td></tr>
+    <tr><td>POST</td><td>/projects/{id}/spawn-agent</td><td>Spawn agent in project</td></tr>
+    <tr><td>GET</td><td>/projects/{id}/unified-timeline</td><td>Merged timeline</td></tr>
+    <tr><td>GET</td><td>/roles</td><td>List all roles (162)</td></tr>
+    <tr><td>GET</td><td>/roles/stats</td><td>Role library statistics</td></tr>
+    <tr><td>GET</td><td>/roles/{id}</td><td>Get role with system prompt</td></tr>
+    <tr><td>GET</td><td>/settings</td><td>Get all settings</td></tr>
+    <tr><td>PATCH</td><td>/settings</td><td>Update settings</td></tr>
+  </table>
+</div>
+
+<div class="page">
+  <div class="h1">Appendix B: Environment Variables</div>
+  <p class="p">
+    Environment variables used by the backend server and agent CLI.
+  </p>
+
+  <div class="h2">Backend Server</div>
+  <table class="table">
+    <tr>
+      <th style="width:30%">Variable</th>
+      <th style="width:15%">Default</th>
+      <th style="width:55%">Description</th>
+    </tr>
+    <tr><td><code>PORT</code></td><td>9222</td><td>HTTP server port</td></tr>
+    <tr><td><code>DB_PATH</code></td><td>./data/agents.db</td><td>SQLite database file path</td></tr>
+    <tr><td><code>HOST_HOME_MOUNT</code></td><td>/host-home</td><td>Mounted host home directory for folder browsing</td></tr>
+  </table>
+
+  <div class="h2">Agent CLI (set by spawner)</div>
+  <table class="table">
+    <tr>
+      <th style="width:30%">Variable</th>
+      <th style="width:70%">Description</th>
+    </tr>
+    <tr><td><code>AGENT_URL</code></td><td>Dashboard API base URL (e.g. http://host.docker.internal:9222). Triggers agent mode when set.</td></tr>
+    <tr><td><code>AGENT_ID</code></td><td>Agent UUID (set for resumed agents to load correct session)</td></tr>
+    <tr><td><code>AGENT_TITLE</code></td><td>Display name for the agent (role name or &ldquo;Agent&rdquo;)</td></tr>
+    <tr><td><code>DASHBOARD_API_KEY</code></td><td>API key for authenticating with the backend</td></tr>
+    <tr><td><code>PROJECT_ID</code></td><td>UUID of the parent project (enables orchestration tools)</td></tr>
+    <tr><td><code>PARENT_AGENT_ID</code></td><td>UUID of the PM agent (set for sub-agents)</td></tr>
+    <tr><td><code>ROLE_ID</code></td><td>Role library ID for fetching specialized system prompt</td></tr>
+    <tr><td><code>PROJECT_AGENTS</code></td><td>Pipe-separated list of sibling agents (id:role:status)</td></tr>
+    <tr><td><code>ANTHROPIC_API_KEY</code></td><td>Direct API key (bypasses OAuth bridge)</td></tr>
+    <tr><td><code>MODEL</code></td><td>Model ID (default: claude-sonnet-4-20250514)</td></tr>
+    <tr><td><code>THINKING</code></td><td>Set to &ldquo;true&rdquo; to enable extended thinking (10K token budget)</td></tr>
+  </table>
+</div>
+
+<div class="page">
+  <div class="h1">Appendix C: Database Schema Diagram</div>
+  <p class="p">
+    Logical relationships between the 10 database tables.
+  </p>
+
+  <table class="table">
+    <tr>
+      <th style="width:25%">Relationship</th>
+      <th style="width:75%">Description</th>
+    </tr>
+    <tr>
+      <td><code>projects</code> &rarr; <code>agents</code></td>
+      <td>One-to-many via <code>agents.project_id</code>. A project has one PM agent and
+          zero or more sub-agents.</td>
+    </tr>
+    <tr>
+      <td><code>agents</code> &rarr; <code>agents</code></td>
+      <td>Self-referential via <code>agents.parent_agent_id</code>. Sub-agents reference
+          their PM agent.</td>
+    </tr>
+    <tr>
+      <td><code>agents</code> &rarr; <code>updates</code></td>
+      <td>One-to-many via <code>updates.agent_id</code>. Agent activity timeline entries.</td>
+    </tr>
+    <tr>
+      <td><code>agents</code> &rarr; <code>messages</code></td>
+      <td>One-to-many via <code>messages.agent_id</code>. Incoming messages for an agent,
+          with optional <code>source_agent_id</code> for inter-agent relay.</td>
+    </tr>
+    <tr>
+      <td><code>agents</code> &rarr; <code>files</code></td>
+      <td>One-to-many via <code>files.agent_id</code>. Uploaded file metadata (data stored on disk).</td>
+    </tr>
+    <tr>
+      <td><code>projects</code> &rarr; <code>project_updates</code></td>
+      <td>One-to-many via <code>project_updates.project_id</code>. Project-level timeline events.</td>
+    </tr>
+    <tr>
+      <td><code>launch_requests</code></td>
+      <td>Standalone queue table. Links to agents via metadata JSON in <code>agent_id</code> field
+          (stores project_id, role, parent_agent_id, prompt as JSON blob).</td>
+    </tr>
+    <tr>
+      <td><code>settings</code></td>
+      <td>Key-value store. No foreign keys. Stores workspace_root, claude_config_path,
+          resource limits, API key, and setup state.</td>
+    </tr>
+    <tr>
+      <td><code>workflows</code></td>
+      <td>Standalone. Multi-step workflow definitions with JSON step arrays.</td>
+    </tr>
+    <tr>
+      <td><code>webhooks</code></td>
+      <td>Standalone. External notification targets with failure tracking.</td>
+    </tr>
+  </table>
+
+  <div class="h2">Index Strategy</div>
+  <p class="p">
+    The schema defines 8 indexes optimised for the most common query patterns:
+  </p>
+  <ul class="ul">
+    <li><code>idx_agents_project</code> &mdash; list agents by project (project detail page)</li>
+    <li><code>idx_agents_status</code> &mdash; filter agents by status (dashboard list)</li>
+    <li><code>idx_updates_agent_id</code> and <code>idx_updates_agent</code> &mdash; agent timeline queries</li>
+    <li><code>idx_messages_agent_id</code> and <code>idx_messages_agent_status</code> &mdash; pending message delivery</li>
+    <li><code>idx_files_agent_id</code> &mdash; agent file listings</li>
+    <li><code>idx_project_updates_project_id</code> &mdash; project timeline queries</li>
+    <li><code>idx_launch_requests_status</code> &mdash; spawner queue processing</li>
+  </ul>
+</div>
+
+
+
+</body>
+</html>
