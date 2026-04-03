@@ -1,0 +1,94 @@
+/* ── PrintingPress — Base Typography & Layout ── */
+/* Inter font is loaded by build.py at the top of the stylesheet */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Inter, -apple-system, Helvetica, Arial, sans-serif;
+  font-size: 9.5pt;
+  font-weight: 400;
+  color: #111827;
+  line-height: 1.6;
+}
+
+/* ── PAGE BREAKS ── */
+.page { page-break-before: always; }
+
+/* ── HEADINGS ── */
+.h1 {
+  font-size: 19pt;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4mm;
+  padding-bottom: 3mm;
+  border-bottom: 2pt solid #1e3a8a;
+}
+.h2 {
+  font-size: 13pt;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-top: 7mm;
+  margin-bottom: 3mm;
+}
+.h3 {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #374151;
+  margin-top: 4mm;
+  margin-bottom: 2mm;
+}
+
+/* ── BODY TEXT ── */
+.p {
+  margin-bottom: 3mm;
+  font-size: 9.5pt;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* ── UNORDERED LIST ── */
+.ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 3mm;
+}
+.ul li {
+  padding-left: 5mm;
+  position: relative;
+  margin-bottom: 2mm;
+  font-size: 9.5pt;
+  line-height: 1.55;
+  color: #374151;
+}
+.ul li::before { content: "\2013"; position: absolute; left: 0; color: #9ca3af; }
+
+/* ── ORDERED LIST ── */
+.ol {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 3mm;
+  counter-reset: ol-counter;
+}
+.ol li {
+  padding-left: 7mm;
+  position: relative;
+  margin-bottom: 2.5mm;
+  font-size: 9.5pt;
+  line-height: 1.55;
+  color: #374151;
+  counter-increment: ol-counter;
+}
+.ol li::before {
+  content: counter(ol-counter) ".";
+  position: absolute;
+  left: 0;
+  color: #6b7280;
+  font-weight: 700;
+}
+
+/* ── HORIZONTAL RULE ── */
+hr.rule { border: none; border-top: 1pt solid #e5e7eb; margin: 6mm 0; }
+
+/* ── RUNNING HEADER LOGO ── */
+#header-logo { position: running(header-logo); }
+#header-logo img { height: 11pt; }

@@ -1,8 +1,7 @@
 node_modules/
+.next/
 dist/
-web/dist/
 .claude/
-claudeadmin/
 *.db
 *.db-wal
 *.db-shm
@@ -10,24 +9,19 @@ claudeadmin/
 .DS_Store
 Thumbs.db
 *.log
-debug.log
 *.exe
-.playwright-mcp/
-certs/
 
 # Compiled binaries
 agent-cli
 server
+images/*/agent-cli
 
-# Generated docs
-docs/output/
-
-# Agent session artifacts
+# Agent artifacts (in workspaces, not in repo)
 .agent-sessions/
 .agent-tasks.json
 .plans/
+.scratchpad/
 
 # Build artifacts
 *.o
 tsconfig.tsbuildinfo
-tsconfig.node.tsbuildinfo

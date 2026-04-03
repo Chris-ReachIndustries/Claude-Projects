@@ -1,0 +1,227 @@
+/* ── PrintingPress — Lumi Theme (Typography & Components) ── */
+/* Lumi accent color: #0693e3 (bright blue) */
+
+/* ── SECTIONS ── */
+.section {
+  page-break-before: always;
+  padding-top: 2mm;
+}
+.section:first-of-type { page-break-before: avoid; }
+
+h2.section-title {
+  font-size: 14pt;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 5mm;
+  padding-bottom: 2.5mm;
+  border-bottom: 1.5pt solid #e5e7eb;
+  border-left: 3.5pt solid #0693e3;
+  padding-left: 3mm;
+  bookmark-level: 1;
+  bookmark-label: content();
+}
+h3.subsection {
+  font-size: 10.5pt;
+  font-weight: 600;
+  color: #0693e3;
+  margin: 5mm 0 2.5mm;
+  bookmark-level: 2;
+  bookmark-label: content();
+}
+
+/* ── Q&A BLOCKS ── */
+.qa-block { margin: 4mm 0; page-break-inside: avoid; }
+.question {
+  font-size: 9.5pt;
+  font-weight: 600;
+  color: #0693e3;
+  margin-bottom: 2mm;
+  padding: 2.5mm 3mm;
+  background: #f0f8ff;
+  border-left: 2.5pt solid #0693e3;
+  border-radius: 0 3px 3px 0;
+}
+.answer { padding: 0 0 0 1mm; }
+.answer p { margin: 1.5mm 0; font-size: 9.5pt; }
+.answer ul { padding-left: 5mm; margin: 1.5mm 0; }
+.answer li { margin: 1mm 0; font-size: 9pt; }
+.answer strong { color: #111827; }
+
+/* ── LUMI TABLES ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 3.5mm 0;
+  font-size: 8.5pt;
+  page-break-inside: avoid;
+}
+thead th {
+  background: #f3f4f6;
+  color: #0693e3;
+  font-weight: 600;
+  text-align: left;
+  padding: 2.5mm 3mm;
+  border-bottom: 1.5pt solid #e5e7eb;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+tbody td {
+  padding: 2mm 3mm;
+  border-bottom: 0.5pt solid #e5e7eb;
+  vertical-align: top;
+  font-size: 8.5pt;
+}
+tbody tr:nth-child(even) td { background: #f9fafb; }
+
+/* ── LUMI BADGES ── */
+.badge-blue   { background: #e8f4fd; color: #0693e3; }
+.badge-green  { background: #ecfdf5; color: #00a86b; }
+.badge-orange { background: #fef9ec; color: #d97706; }
+.badge-red    { background: #fef3f2; color: #dc2626; }
+.badge-purple { background: #f5f0ff; color: #9b51e0; }
+
+/* ── CARDS / GRID ── */
+.card-row {
+  display: flex;
+  gap: 3mm;
+  margin: 3.5mm 0;
+  page-break-inside: avoid;
+}
+.card {
+  flex: 1;
+  border: 0.5pt solid #e5e7eb;
+  border-radius: 5px;
+  padding: 3mm 3.5mm;
+  background: #fafafa;
+}
+.card h4 { font-size: 8.5pt; font-weight: 600; color: #0693e3; margin-bottom: 1.5mm; }
+.card p, .card li { font-size: 8pt; color: #374151; }
+.card ul { padding-left: 4mm; }
+
+/* ── KV ROW (key-value pairs) ── */
+.kv-row {
+  display: flex;
+  gap: 3mm;
+  margin: 3mm 0;
+  page-break-inside: avoid;
+}
+.kv-item {
+  flex: 1;
+  border: 0.5pt solid #e5e7eb;
+  border-radius: 5px;
+  padding: 2.5mm 3mm;
+  text-align: center;
+  background: #fafafa;
+}
+.kv-key { font-size: 6.5pt; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 1mm; }
+.kv-value { font-size: 10pt; font-weight: 700; color: #111827; }
+
+/* ── STATS BANNER ── */
+.stats-row {
+  display: flex;
+  gap: 3mm;
+  margin: 4mm 0;
+  page-break-inside: avoid;
+}
+.stat-box {
+  flex: 1;
+  text-align: center;
+  padding: 3mm;
+  background: linear-gradient(135deg,#f0f8ff,#f5f0ff);
+  border: 0.5pt solid #e5e7eb;
+  border-radius: 5px;
+}
+.stat-box .num { font-size: 14pt; font-weight: 700; color: #0693e3; line-height: 1; }
+.stat-box .lbl { font-size: 7pt; color: #6b7280; margin-top: 1mm; }
+
+/* ── ARCHITECTURE DIAGRAM ── */
+.arch-wrap {
+  margin: 4mm 0;
+  page-break-inside: avoid;
+  border: 0.5pt solid #e5e7eb;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.arch-wrap img { width: 100%; display: block; }
+.arch-caption {
+  padding: 2.5mm 4mm;
+  background: #f8f9fa;
+  border-top: 0.5pt solid #e5e7eb;
+  font-size: 7.5pt;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* ── LAYER PILLS ── */
+.layer-row {
+  display: flex;
+  gap: 3mm;
+  flex-wrap: wrap;
+  margin: 3mm 0 4mm;
+}
+.layer-pill {
+  display: flex;
+  align-items: center;
+  gap: 2mm;
+  border: 0.5pt solid #e5e7eb;
+  border-radius: 20px;
+  padding: 1.5mm 4mm;
+  font-size: 7.5pt;
+  font-weight: 500;
+  background: white;
+}
+.dot { width: 6pt; height: 6pt; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+/* ── SECTION INTRO BOX ── */
+.intro-box {
+  background: #f8f9fa;
+  border: 0.5pt solid #e5e7eb;
+  border-radius: 5px;
+  padding: 3mm 4mm;
+  margin-bottom: 4mm;
+  font-size: 9pt;
+  color: #374151;
+}
+
+/* ── CATEGORY LABEL ── */
+.cat-label {
+  font-size: 7pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #0693e3;
+  border-bottom: 0.5pt solid #e5e7eb;
+  padding-bottom: 1mm;
+  margin: 4mm 0 2mm;
+}
+
+/* ── REGULATORY BOX ── */
+.reg-box {
+  background: #f5f0ff;
+  border: 0.5pt solid #9b51e0;
+  border-radius: 5px;
+  padding: 3mm 4mm;
+  margin: 3mm 0;
+  page-break-inside: avoid;
+}
+.reg-box h4 { font-size: 8pt; font-weight: 600; color: #9b51e0; margin-bottom: 1.5mm; }
+.reg-box p, .reg-box li { font-size: 8.5pt; }
+.reg-box ul { padding-left: 4mm; }
+
+/* ── OWNERSHIP BADGES ── */
+.owner-badge { font-size: 7pt; font-weight: 700; padding: 0.8mm 2.5mm; border-radius: 3px; }
+.own-customer { background: #ecfdf5; color: #00a86b; }
+.own-joint    { background: #e8f4fd; color: #0693e3; }
+.own-lumi     { background: #fef9ec; color: #d97706; }
+
+/* ── EXPAND DIAGRAM ── */
+.expand-row {
+  display: flex;
+  gap: 3mm;
+  margin: 3mm 0;
+  font-size: 8pt;
+  page-break-inside: avoid;
+}
+.expand-item { flex: 1; display: flex; align-items: flex-start; gap: 2mm; }
+.expand-arrow { color: #0693e3; font-weight: 700; flex-shrink: 0; }

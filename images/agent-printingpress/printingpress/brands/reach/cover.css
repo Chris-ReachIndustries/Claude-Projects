@@ -1,0 +1,136 @@
+/* ── PrintingPress — Reach Industries Cover Page ── */
+
+.cover {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  background: #041077;
+  display: flex;
+  flex-direction: column;
+  page-break-after: always;
+  overflow: hidden;
+}
+.cover-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12mm 16mm 0;
+  position: relative;
+  z-index: 1;
+}
+.cover-brand { display: flex; align-items: center; gap: 4mm; }
+.cover-logo-box {
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 2mm 3mm;
+  display: flex;
+  align-items: center;
+}
+.cover-logo-box img { height: 28pt; }
+.cover-company {
+  font-size: 12pt;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 1.2pt;
+  text-transform: uppercase;
+  padding-left: 4mm;
+  border-left: 1.5pt solid rgba(77,101,255,0.7);
+}
+.cover-badge {
+  font-size: 7pt;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.8pt;
+  border: 0.5pt solid rgba(255,255,255,0.2);
+  padding: 1.5mm 3mm;
+  border-radius: 2px;
+}
+.cover-stripe {
+  width: 100%;
+  height: 5pt;
+  background: linear-gradient(90deg, #4d65ff 0%, #4d65ff 45%, #1f2937 72%, #dc2626 100%);
+  flex-shrink: 0;
+  margin-top: 9mm;
+}
+.cover-bg {
+  position: absolute;
+  right: 0;
+  bottom: 30mm;
+  font-size: 120pt;
+  font-weight: 900;
+  color: rgba(255,255,255,0.025);
+  letter-spacing: -4pt;
+  line-height: 1;
+}
+.cover-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 16mm 5mm;
+  position: relative;
+  z-index: 1;
+}
+.cover-eyebrow {
+  font-size: 8pt;
+  font-weight: 700;
+  color: #4d65ff;
+  letter-spacing: 1.8pt;
+  text-transform: uppercase;
+  margin-bottom: 6mm;
+}
+.cover-title {
+  font-size: 28pt;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: -0.5pt;
+  margin-bottom: 4mm;
+}
+.cover-subtitle {
+  font-size: 10.5pt;
+  font-weight: 300;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.5;
+  max-width: 155mm;
+  margin-bottom: 7mm;
+}
+.cover-pills { display: flex; gap: 2.5mm; flex-wrap: wrap; }
+.cover-pill {
+  font-size: 7pt;
+  font-weight: 700;
+  border-radius: 2px;
+  padding: 1.5mm 3mm;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+}
+.cover-pill.pill-1 { background: rgba(77,101,255,0.3); color: #93c5fd; }
+.cover-pill.pill-2 { background: rgba(31,41,55,0.6);   color: #d1d5db; }
+.cover-pill.pill-3 { background: rgba(220,38,38,0.25); color: #fca5a5; }
+.cover-bottom-bar { display: flex; flex-shrink: 0; }
+.cover-bar-a {
+  flex: 3;
+  height: 12mm;
+  background: #1e3a8a;
+  display: flex; align-items: center; padding-left: 16mm;
+  font-size: 6.5pt; font-weight: 600; color: rgba(255,255,255,0.5);
+  text-transform: uppercase; letter-spacing: 0.8pt;
+}
+.cover-bar-b {
+  flex: 1;
+  height: 12mm;
+  background: #7f1d1d;
+  display: flex; align-items: center; padding-left: 6mm;
+  font-size: 6.5pt; font-weight: 600; color: rgba(255,255,255,0.5);
+  text-transform: uppercase; letter-spacing: 0.8pt;
+}
+.cover-footer {
+  padding: 5mm 16mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 0.5pt solid rgba(255,255,255,0.12);
+}
+.cover-footer-left { font-size: 7.5pt; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5pt; }
+.cover-footer-right { font-size: 8pt; color: rgba(255,255,255,0.4); }

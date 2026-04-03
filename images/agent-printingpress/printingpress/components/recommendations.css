@@ -1,0 +1,33 @@
+/* ── PrintingPress — Recommendations & Gap Lists ── */
+
+/* ── NUMBERED RECOMMENDATION LIST ── */
+.rec-list { list-style: none; padding: 0; }
+.rec-item { display: flex; gap: 3.5mm; margin-bottom: 4mm; align-items: flex-start; }
+.rec-num {
+  width: 7mm;
+  height: 7mm;
+  background: #1e3a8a;
+  color: #ffffff;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8pt;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 0.5mm;
+}
+.rec-body { flex: 1; font-size: 9.5pt; color: #374151; line-height: 1.55; }
+
+/* ── GAP LIST ── */
+.gap-list { list-style: none; padding: 0; }
+.gap-item {
+  display: flex;
+  gap: 3mm;
+  padding: 2.5mm 0;
+  border-bottom: 0.5pt solid #f3f4f6;
+  font-size: 9.5pt;
+  color: #374151;
+  align-items: flex-start;
+}
+.gap-num { flex-shrink: 0; width: 5mm; font-weight: 700; color: #dc2626; }

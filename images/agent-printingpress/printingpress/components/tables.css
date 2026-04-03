@@ -1,0 +1,36 @@
+/* ── PrintingPress — Tables ── */
+
+table.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 4mm;
+  font-size: 8.5pt;
+}
+table.table th {
+  background: #1e3a8a;
+  color: #ffffff;
+  padding: 2.5mm 3.5mm;
+  text-align: left;
+  font-weight: 700;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+}
+table.table td {
+  padding: 2.5mm 3.5mm;
+  border-bottom: 0.5pt solid #e5e7eb;
+  vertical-align: top;
+  color: #374151;
+  line-height: 1.5;
+}
+table.table tr:nth-child(even) td { background: #f9fafb; }
+
+/* ── STATUS CELLS ── */
+.td-red    { color: #dc2626; font-weight: 700; }
+.td-amber  { color: #b45309; font-weight: 600; }
+.td-green  { color: #16a34a; font-weight: 600; }
+.td-grey   { color: #6b7280; }
+
+/* ── VELOCITY CELLS ── */
+.td-vel-high { color: #16a34a; font-weight: 700; }
+.td-vel-mid  { color: #d97706; font-weight: 700; }

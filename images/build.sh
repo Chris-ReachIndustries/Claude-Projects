@@ -1,22 +1,35 @@
 #!/bin/bash
+# Build all agent Docker images with a shared agent-cli binary
+# Usage: ./images/build.sh [image-name...]
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
-echo "Building agent-cli binary..."
-MSYS_NO_PATHCONV=1 docker run --rm -v "$PROJECT_DIR://src" -w //src \
-  -e CGO_ENABLED=0 -e GOOS=linux -e GOARCH=amd64 \
-  golang:1.24-alpine go build -ldflags="-s -w" -o images/agent/agent-cli ./cmd/agent-cli
+ALL_IMAGES="agent agent-dev agent-go agent-data agent-doc-reader agent-web agent-printingpress"
 
-echo "Building claude-agent image..."
-docker build -t claude-agent "$SCRIPT_DIR/agent"
+if [ $# -gt 0 ]; then IMAGES="$@"; else IMAGES="$ALL_IMAGES"; fi
 
-echo ""
-echo "Agent image built:"
-docker images claude-agent --format "  {{.Repository}}:{{.Tag}} — {{.Size}}"
+echo "=== Building agent-cli ==="
+MSYS_NO_PATHCONV=1 docker run --rm \
+  -v "$PROJECT_DIR:/app" -w /app \
+  -v "$SCRIPT_DIR/agent:/out" \
+  golang:1.24-alpine sh -c "go build -ldflags='-s -w' -o /out/agent-cli ./cmd/agent-cli"
 
-echo ""
-echo "Cleaning up binary..."
-rm -f "$SCRIPT_DIR/agent/agent-cli"
-echo "Done."
+for img in $IMAGES; do
+  [ "$img" != "agent" ] && [ -d "$SCRIPT_DIR/$img" ] && cp "$SCRIPT_DIR/agent/agent-cli" "$SCRIPT_DIR/$img/agent-cli"
+done
+
+echo "=== Building images ==="
+for img in $IMAGES; do
+  [ ! -d "$SCRIPT_DIR/$img" ] && echo "SKIP $img" && continue
+  echo "claude-$img..."
+  docker build --no-cache -t "claude-$img" "$SCRIPT_DIR/$img" | tail -1
+done
+
+for img in $IMAGES; do
+  [ "$img" != "agent" ] && rm -f "$SCRIPT_DIR/$img/agent-cli"
+done
+
+echo "=== Done ==="
+docker images | grep claude-agent | awk '{printf "%-40s %s\n", $1, $NF}'

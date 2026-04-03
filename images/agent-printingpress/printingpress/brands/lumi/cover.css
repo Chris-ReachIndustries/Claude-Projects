@@ -1,0 +1,110 @@
+/* ── PrintingPress — Lumi Cover, TOC & Back Cover ── */
+/* Extracted from the actual Lumi document styling (PDF_CSS) */
+
+/* ── COVER PAGE ── */
+.cover {
+  page-break-after: always;
+  width: 210mm;
+  height: 297mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0;
+  background: white;
+}
+.cover-top {
+  background: linear-gradient(135deg, #0474c4 0%, #7228cc 100%);
+  padding: 28mm 20mm 20mm;
+  color: white;
+}
+.cover-logo { height: 38pt; margin-bottom: 20mm; }
+.cover h1 { font-size: 28pt; font-weight: 700; line-height: 1.2; margin-bottom: 6mm; }
+.cover-subtitle { font-size: 12pt; opacity: 0.88; font-weight: 300; }
+.cover-meta {
+  padding: 12mm 20mm;
+  border-top: 1px solid #e5e7eb;
+}
+.cover-meta p { font-size: 9pt; color: #6b7280; margin: 2mm 0; }
+.cover-footer {
+  padding: 8mm 20mm;
+  background: #f8f9fa;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4mm;
+}
+.cover-footer img { height: 18pt; opacity: 0.65; }
+.cover-badges { display: flex; gap: 4mm; align-items: center; }
+.cover-badges img { height: 26pt; }
+
+/* ── TOC PAGE ── */
+.toc-page {
+  page-break-after: always;
+  padding-top: 8mm;
+}
+.toc-page h2 {
+  font-size: 16pt;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8mm;
+  padding-bottom: 3mm;
+  border-bottom: 2pt solid #0693e3;
+}
+.toc-entry {
+  display: flex;
+  align-items: baseline;
+  margin: 2mm 0;
+  font-size: 9.5pt;
+}
+.toc-entry a { color: #1f2937; text-decoration: none; }
+.toc-entry a:hover { color: #0693e3; }
+.toc-num {
+  color: #0693e3;
+  font-weight: 600;
+  min-width: 8mm;
+  flex-shrink: 0;
+}
+.toc-title { flex: 1; }
+.toc-dots {
+  flex: 1;
+  border-bottom: 1pt dotted #d1d5db;
+  margin: 0 3mm 2pt;
+  min-width: 10mm;
+}
+.toc-page-num {
+  color: #6b7280;
+  font-size: 8.5pt;
+  min-width: 8mm;
+  text-align: right;
+}
+.toc-page-num::after {
+  content: target-counter(attr(href), page);
+}
+.toc-group {
+  margin: 5mm 0 2mm;
+  font-size: 7.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+/* ── BACK COVER ── */
+.back-cover {
+  page: back-cover;
+  page-break-before: always;
+  width: 210mm;
+  height: 297mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: linear-gradient(180deg, #f0f4ff 0%, #ffffff 100%);
+}
+.back-cover img { height: 36pt; margin-bottom: 6mm; }
+.back-cover p { color: #6b7280; font-size: 9pt; margin: 1.5mm 0; }
+.back-cover .badges { display: flex; gap: 5mm; margin: 6mm auto; }
+.back-cover .badges img { height: 32pt; }

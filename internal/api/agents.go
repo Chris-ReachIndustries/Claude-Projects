@@ -29,7 +29,7 @@ func NewAgentRoutes(d *db.DB, sse *SSEBroker, webhookDispatch func(string, map[s
 	return &AgentRoutes{
 		db:  d,
 		sse: sse,
-		updateLimiter: NewRateLimiter(60_000, 60, func(r *http.Request) string {
+		updateLimiter: NewRateLimiter(60_000, 600, func(r *http.Request) string { // 600/min for streaming tool calls + thinking
 			return r.PathValue("id")
 		}),
 		fileLimiter: NewRateLimiter(3_600_000, 20, func(r *http.Request) string {
@@ -93,7 +93,24 @@ func (a *AgentRoutes) PostUpdate(w http.ResponseWriter, r *http.Request) {
 		}
 		a.db.CreateAgent(id, agentTitle)
 
-		// Check recently completed launch requests for project metadata
+		// Link to project using env vars passed directly from the agent
+		projectID, _ := body["project_id"].(string)
+		agentRole, _ := body["role"].(string)
+		parentAgentID, _ := body["parent_agent_id"].(string)
+
+		if projectID != "" {
+			a.db.Exec("UPDATE agents SET project_id = ?, role = ?, parent_agent_id = ? WHERE id = ?",
+				nilIfEmpty(projectID), nilIfEmpty(agentRole), nilIfEmpty(parentAgentID), id)
+
+			// If this is a PM (no parent), set it as the project's PM and deliver queued messages
+			if parentAgentID == "" && agentRole == "PM" {
+				a.db.UpdateProject(projectID, map[string]interface{}{"pm_agent_id": id})
+			}
+
+			slog.Info("Linked agent to project", "agentId", id, "projectId", projectID, "role", agentRole)
+		}
+
+		// Also try launch request matching for message delivery (PM prompts etc)
 		a.linkAgentToProject(id)
 	}
 
@@ -151,7 +168,9 @@ func (a *AgentRoutes) PostUpdate(w http.ResponseWriter, r *http.Request) {
 	if summary != "" {
 		summaryPtr = &summary
 	}
-	a.db.AddUpdate(id, updateType, contentStr, summaryPtr)
+	if err := a.db.AddUpdate(id, updateType, contentStr, summaryPtr); err != nil {
+		slog.Error("Failed to add update", "agentId", id, "type", updateType, "err", err)
+	}
 
 	// Auto-acknowledge delivered messages
 	a.db.AcknowledgeMessages(id)
@@ -316,6 +335,18 @@ func (a *AgentRoutes) Patch(w http.ResponseWriter, r *http.Request) {
 	if v, ok := body["status"].(string); ok {
 		fields["status"] = v
 	}
+	if v, ok := body["project_id"].(string); ok {
+		fields["project_id"] = v
+	}
+	if v, ok := body["role"].(string); ok {
+		fields["role"] = v
+	}
+	if v, ok := body["parent_agent_id"].(string); ok {
+		fields["parent_agent_id"] = v
+	}
+	if v, ok := body["cwd"].(string); ok {
+		fields["cwd"] = v
+	}
 	if v, ok := body["metadata"]; ok {
 		switch mt := v.(type) {
 		case string:
@@ -360,7 +391,15 @@ func (a *AgentRoutes) Close(w http.ResponseWriter, r *http.Request) {
 	id := pathParam(r, "id")
 	agent := a.db.GetAgent(id)
 	if agent == nil {
-		writeJSON(w, http.StatusNotFound, map[string]string{"error": "Agent not found"})
+		// Already closed/deleted — treat as success (idempotent)
+		writeJSON(w, http.StatusOK, map[string]interface{}{"ok": true, "already_closed": true})
+		return
+	}
+
+	status, _ := agent["status"].(string)
+	if status == "archived" || status == "completed" {
+		// Already archived — treat as success
+		writeJSON(w, http.StatusOK, map[string]interface{}{"ok": true, "already_closed": true})
 		return
 	}
 

@@ -51,6 +51,14 @@ func (s *Spawner) Start() {
 		}
 	}()
 
+	// Container health checker — every 2 minutes, check if agent containers are still running
+	go func() {
+		ticker := time.NewTicker(2 * time.Minute)
+		for range ticker.C {
+			s.checkContainerHealth()
+		}
+	}()
+
 	// Main processing loop
 	go func() {
 		for reqID := range s.Requests {
@@ -161,6 +169,7 @@ func (s *Spawner) spawnNewAgent(reqID int64, folderPath, image, agentTitle strin
 	// Extract project context from metadata for agent-to-agent communication
 	projectID := ""
 	parentAgentID := ""
+	roleID := ""
 	if agentIDField, ok := req["agent_id"].(string); ok && strings.HasPrefix(agentIDField, "{") {
 		var meta map[string]interface{}
 		if json.Unmarshal([]byte(agentIDField), &meta) == nil {
@@ -170,12 +179,16 @@ func (s *Spawner) spawnNewAgent(reqID int64, folderPath, image, agentTitle strin
 			if paid, ok := meta["parent_agent_id"].(string); ok {
 				parentAgentID = paid
 			}
+			if rid, ok := meta["role_id"].(string); ok {
+				roleID = rid
+			}
 		}
 	}
 
 	// Build workspace path: folderPath > project's folder_path > workspace root
+	slog.Info("Spawn workspace resolution", "folderPath", folderPath, "projectID", projectID, "workspaceRoot", workspaceRoot)
 	hostPath := workspaceRoot
-	if folderPath != "" {
+	if folderPath != "" && folderPath != "/workspace" && folderPath != "workspace" {
 		hostPath = workspaceRoot + "/" + strings.TrimPrefix(folderPath, "/")
 	} else if projectID != "" {
 		// Sub-agent with no explicit folder — inherit from project
@@ -206,9 +219,33 @@ func (s *Spawner) spawnNewAgent(reqID int64, folderPath, image, agentTitle strin
 	// Pass project context for agent-to-agent communication
 	if projectID != "" {
 		args = append(args, "-e", "PROJECT_ID="+projectID)
+
+		// Inject sibling agent info so agents know about each other
+		siblings := s.db.GetProjectAgents(projectID)
+		if len(siblings) > 0 {
+			var siblingInfo []string
+			for _, sib := range siblings {
+				sibID, _ := sib["id"].(string)
+				sibRole, _ := sib["role"].(string)
+				sibTitle, _ := sib["title"].(string)
+				sibStatus, _ := sib["status"].(string)
+				if sibRole == "" {
+					sibRole = sibTitle
+				}
+				if sibID != "" && sibStatus != "archived" {
+					siblingInfo = append(siblingInfo, fmt.Sprintf("%s:%s:%s", sibID, sibRole, sibStatus))
+				}
+			}
+			if len(siblingInfo) > 0 {
+				args = append(args, "-e", "PROJECT_AGENTS="+strings.Join(siblingInfo, "|"))
+			}
+		}
 	}
 	if parentAgentID != "" {
 		args = append(args, "-e", "PARENT_AGENT_ID="+parentAgentID)
+	}
+	if roleID != "" {
+		args = append(args, "-e", "ROLE_ID="+roleID)
 	}
 
 	args = append(args, image)
@@ -221,6 +258,7 @@ func (s *Spawner) spawnResumeAgent(reqID int64, agentID, folderPath, image, agen
 	claudeConfigPath, _ := s.db.GetSetting("claude_config_path")
 	memLimit, _ := s.db.GetSetting("agent_memory_limit")
 	cpuLimit, _ := s.db.GetSetting("agent_cpu_limit")
+	dashboardKey, _ := s.db.GetSetting("api_key")
 
 	if workspaceRoot == "" || claudeConfigPath == "" {
 		return fmt.Errorf("setup not complete")
@@ -232,11 +270,36 @@ func (s *Spawner) spawnResumeAgent(reqID int64, agentID, folderPath, image, agen
 		cpuLimit = "1"
 	}
 
-	// Try to get agent's stored cwd
-	if folderPath == "" {
-		if agent := s.db.GetAgent(agentID); agent != nil {
-			if cwd, ok := agent["cwd"].(string); ok {
+	// Get agent details from DB for context
+	agent := s.db.GetAgent(agentID)
+	if agent != nil {
+		if folderPath == "" {
+			if cwd, ok := agent["cwd"].(string); ok && cwd != "" && cwd != "/workspace" {
+				// Only use CWD if it's a real subfolder, not the container-internal /workspace
 				folderPath = cwd
+			}
+		}
+		if agentTitle == "" || agentTitle == "Container Agent" {
+			if title, ok := agent["title"].(string); ok && title != "" {
+				agentTitle = title
+			}
+			if role, ok := agent["role"].(string); ok && role != "" {
+				agentTitle = role
+			}
+		}
+	}
+
+	// If folderPath is still empty, check project
+	projectID := ""
+	if agent != nil {
+		if pid, ok := agent["project_id"].(string); ok {
+			projectID = pid
+		}
+	}
+	if folderPath == "" && projectID != "" {
+		if project := s.db.GetProject(projectID); project != nil {
+			if pf, ok := project["folder_path"].(string); ok && pf != "" {
+				folderPath = pf
 			}
 		}
 	}
@@ -246,22 +309,29 @@ func (s *Spawner) spawnResumeAgent(reqID int64, agentID, folderPath, image, agen
 	if folderPath != "" {
 		hostPath = workspaceRoot + "/" + strings.TrimPrefix(folderPath, "/")
 	}
+	slog.Info("Resume mount resolved", "agentId", agentID, "folderPath", folderPath, "projectID", projectID, "hostPath", hostPath)
 
 	agentURL := "http://host.docker.internal:9222"
 
 	args := []string{
-		"run", "-d", "-it",
+		"run", "-d",
 		"--name", containerName,
 		"-v", hostPath + ":/workspace",
 		"-v", claudeConfigPath + "/.claude/.credentials.json:/home/agent/.claude/.credentials.json:ro",
-		"-v", claudeConfigPath + "/.claude.json:/home/agent/.claude.json",
 		"-w", "/workspace",
 		"-e", "AGENT_URL=" + agentURL,
+		"-e", "AGENT_TITLE=" + agentTitle,
+		"-e", "DASHBOARD_API_KEY=" + dashboardKey,
+		"-e", "AGENT_ID=" + agentID, // Reuse original agent ID
 		"--memory", memLimit,
 		"--cpus", cpuLimit,
-		"-e", "POLL_INTERVAL=10",
-		image,
 	}
+
+	if projectID != "" {
+		args = append(args, "-e", "PROJECT_ID="+projectID)
+	}
+
+	args = append(args, image)
 
 	return s.runDocker(args, containerName)
 }
@@ -304,7 +374,47 @@ func (s *Spawner) runDocker(args []string, containerName string) error {
 	}
 
 	containerID := strings.TrimSpace(string(output))
-	slog.Info("Container spawned", "name", containerName, "id", containerID[:12])
+	if len(containerID) > 12 {
+		slog.Info("Container spawned", "name", containerName, "id", containerID[:12])
+	}
 
 	return nil
+}
+
+// checkContainerHealth checks if agent containers are still running.
+// If a container exited, marks the agent as "error" status.
+func (s *Spawner) checkContainerHealth() {
+	// Get running cam-agent containers
+	cmd := exec.Command("docker", "ps", "-a", "--filter", "name=cam-agent", "--format", "{{.Names}}|{{.Status}}")
+	output, err := cmd.Output()
+	if err != nil {
+		return
+	}
+
+	for _, line := range strings.Split(strings.TrimSpace(string(output)), "\n") {
+		if line == "" {
+			continue
+		}
+		parts := strings.SplitN(line, "|", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		containerName := parts[0]
+		status := parts[1]
+
+		// Check if container exited unexpectedly
+		if strings.Contains(status, "Exited") && !strings.Contains(status, "Exited (0)") {
+			// Non-zero exit = crash. Find the agent and mark as error.
+			// Container name format: cam-agent-{requestID}
+			slog.Warn("Container crashed", "container", containerName, "status", status)
+
+			// Try to find matching agent by checking recent agents
+			// This is a best-effort approach
+			s.sse.Broadcast("container-health", map[string]interface{}{
+				"container": containerName,
+				"status":    "crashed",
+				"details":   status,
+			})
+		}
+	}
 }

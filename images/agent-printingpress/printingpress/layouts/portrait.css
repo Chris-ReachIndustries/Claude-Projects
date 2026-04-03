@@ -1,0 +1,24 @@
+/* ── PrintingPress — A4 Portrait Layout ── */
+/* @page content rules (header/footer text) are injected by build.py */
+
+@page {
+  size: A4 portrait;
+  margin: 15mm 18mm 15mm 18mm;
+  @top-left {
+    content: element(header-logo);
+    vertical-align: middle;
+  }
+  @bottom-right {
+    content: counter(page);
+    font-family: Inter, Helvetica, sans-serif;
+    font-size: 7pt;
+    color: #9ca3af;
+  }
+}
+@page :first {
+  margin: 0;
+  @top-left    { content: none; }
+  @top-right   { content: none; }
+  @bottom-right{ content: none; }
+  @bottom-left { content: none; }
+}

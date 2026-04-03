@@ -1,0 +1,70 @@
+/* ── PrintingPress — Person Cards & Badges ── */
+
+/* ── PERSON HEADER ── */
+.person-hdr {
+  display: flex;
+  align-items: center;
+  gap: 4mm;
+  padding: 4mm 5mm;
+  border-left: 3.5pt solid #1e3a8a;
+  border-radius: 4px 4px 0 0;
+}
+.person-hdr.red   { border-left-color: #dc2626; background: #fef9f9; }
+.person-hdr.amber { border-left-color: #d97706; background: #fffdf5; }
+.person-hdr.green { border-left-color: #16a34a; background: #f7fdf9; }
+.person-hdr.blue  { border-left-color: #1d4ed8; background: #f0f7ff; }
+.person-hdr.grey  { border-left-color: #6b7280; background: #f8fafc; }
+
+.person-name { font-size: 15pt; font-weight: 800; color: #111827; line-height: 1.1; }
+.person-role { font-size: 8pt; color: #6b7280; margin-top: 0.5mm; }
+
+/* ── BADGES ── */
+.badge {
+  margin-left: auto;
+  font-size: 7pt;
+  font-weight: 700;
+  padding: 1.5mm 3mm;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.badge-red   { background: #fef2f2; color: #dc2626; border: 0.5pt solid #fca5a5; }
+.badge-amber { background: #fffbeb; color: #b45309; border: 0.5pt solid #fcd34d; }
+.badge-green { background: #f0fdf4; color: #16a34a; border: 0.5pt solid #86efac; }
+.badge-blue  { background: #eff6ff; color: #1d4ed8; border: 0.5pt solid #bfdbfe; }
+.badge-grey  { background: #f8fafc; color: #64748b; border: 0.5pt solid #cbd5e1; }
+
+/* ── PERSON BODY ── */
+.person-body {
+  padding: 4mm 5mm;
+  border: 0.5pt solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  margin-bottom: 5mm;
+}
+
+/* ── TEAM CHIPS ── */
+.team-row { display: flex; flex-direction: column; gap: 2mm; margin-bottom: 4mm; }
+.team-item { display: flex; align-items: center; gap: 2.5mm; font-size: 9.5pt; color: #374151; }
+.chip {
+  font-size: 7pt;
+  font-weight: 700;
+  padding: 0.8mm 2.5mm;
+  border-radius: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.chip-lead   { background: #eff6ff; color: #1d4ed8; border: 0.5pt solid #bfdbfe; }
+.chip-senior { background: #f0fdf4; color: #16a34a; border: 0.5pt solid #86efac; }
+.chip-mid    { background: #faf5ff; color: #7c3aed; border: 0.5pt solid #ddd6fe; }
+
+/* ── INTRO CARD ── */
+.intro-card {
+  background: #f8fafc;
+  border: 0.5pt solid #e5e7eb;
+  border-radius: 4px;
+  padding: 4mm 5mm;
+  margin-bottom: 5mm;
+}

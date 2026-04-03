@@ -68,7 +68,6 @@ type RouterConfig struct {
 	RetentionStatus func() map[string]interface{}
 	RunRetention    func() map[string]interface{}
 	HostHomeMount   string
-	StaticFS        http.Handler
 	Spawner         SpawnerNotifier
 }
 
@@ -84,6 +83,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	retention := NewRetentionRoutes(cfg.DB, cfg.RetentionStatus, cfg.RunRetention)
 	settings := NewSettingsRoutes(cfg.DB)
 	workspace := NewWorkspaceRoutes(cfg.DB)
+	roleRoutes := NewRoleRoutes()
 
 	// Health
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
@@ -143,6 +143,7 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	mux.HandleFunc("GET /api/projects", projects.List)
 	mux.HandleFunc("POST /api/projects", projects.Create)
 	mux.HandleFunc("GET /api/projects/{id}", projects.Get)
+	mux.HandleFunc("PATCH /api/projects/{id}", projects.Update)
 	mux.HandleFunc("GET /api/projects/{id}/agents", projects.GetAgents)
 	mux.HandleFunc("GET /api/projects/{id}/updates", projects.GetUpdates)
 	mux.HandleFunc("POST /api/projects/{id}/updates", projects.PostUpdate)
@@ -184,14 +185,14 @@ func NewRouter(cfg RouterConfig) http.Handler {
 	mux.HandleFunc("GET /api/settings", settings.Get)
 	mux.HandleFunc("PATCH /api/settings", settings.Update)
 
+	// Roles (agent role library)
+	mux.HandleFunc("GET /api/roles", roleRoutes.List)
+	mux.HandleFunc("GET /api/roles/stats", roleRoutes.Stats)
+	mux.HandleFunc("GET /api/roles/{id}", roleRoutes.Get)
+
 	// Workspace files
 	mux.HandleFunc("GET /api/workspace/files", workspace.ListFiles)
 	mux.HandleFunc("GET /api/workspace/file", workspace.ReadFile)
-
-	// Static files (frontend SPA)
-	if cfg.StaticFS != nil {
-		mux.Handle("/", cfg.StaticFS)
-	}
 
 	// Stack middleware: CORS -> Auth -> Gzip -> Mux
 	var handler http.Handler = mux

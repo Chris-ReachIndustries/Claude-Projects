@@ -1,0 +1,134 @@
+/* ── PrintingPress — Plain / Unbranded Cover ── */
+
+.cover {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  page-break-after: always;
+  overflow: hidden;
+  border-top: 6pt solid #1f2937;
+}
+.cover-accent {
+  width: 100%;
+  height: 1.5pt;
+  background: #d1d5db;
+  flex-shrink: 0;
+}
+.cover-top {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 10mm 16mm 0;
+  position: relative;
+  z-index: 1;
+}
+.cover-badge {
+  font-size: 7pt;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 1pt;
+  border: 0.5pt solid #d1d5db;
+  padding: 1.5mm 3mm;
+  border-radius: 1px;
+}
+.cover-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 16mm 8mm;
+  position: relative;
+  z-index: 1;
+}
+.cover-eyebrow {
+  font-size: 8pt;
+  font-weight: 600;
+  color: #9ca3af;
+  letter-spacing: 2pt;
+  text-transform: uppercase;
+  margin-bottom: 5mm;
+}
+.cover-title {
+  font-size: 32pt;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1.05;
+  letter-spacing: -0.5pt;
+  margin-bottom: 4mm;
+}
+.cover-subtitle {
+  font-size: 11pt;
+  font-weight: 300;
+  color: #6b7280;
+  line-height: 1.5;
+  max-width: 155mm;
+  margin-bottom: 8mm;
+}
+.cover-pills { display: flex; gap: 2.5mm; flex-wrap: wrap; margin-top: 2mm; }
+.cover-pill {
+  font-size: 7pt;
+  font-weight: 600;
+  border-radius: 1px;
+  padding: 1.5mm 3mm;
+  text-transform: uppercase;
+  letter-spacing: 0.4pt;
+  background: #f3f4f6;
+  color: #374151;
+}
+.cover-divider {
+  width: 20mm;
+  height: 1pt;
+  background: #d1d5db;
+  margin: 0 16mm 0;
+  flex-shrink: 0;
+}
+.cover-bottom-bar {
+  display: flex;
+  flex-shrink: 0;
+  padding: 5mm 16mm;
+  background: #1f2937;
+  margin-top: 6mm;
+}
+.cover-bar-a {
+  flex: 3;
+  font-size: 7.5pt;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.8pt;
+  display: flex;
+  align-items: center;
+}
+.cover-bar-b {
+  flex: 2;
+  font-size: 7.5pt;
+  font-weight: 400;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.6pt;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.cover-footer {
+  padding: 4mm 16mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 0.5pt solid #e5e7eb;
+}
+.cover-footer-left {
+  font-size: 7.5pt;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5pt;
+}
+.cover-footer-right {
+  font-size: 7.5pt;
+  color: #9ca3af;
+  font-style: italic;
+}

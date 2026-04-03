@@ -22,7 +22,7 @@ func NewLaunchRoutes(d *db.DB, sse *SSEBroker, spawner SpawnerNotifier) *LaunchR
 		db:      d,
 		sse:     sse,
 		spawner: spawner,
-		limiter: NewRateLimiter(300_000, 10, func(r *http.Request) string {
+		limiter: NewRateLimiter(60_000, 30, func(r *http.Request) string { // 30 per minute
 			return r.RemoteAddr
 		}),
 	}
@@ -161,13 +161,19 @@ func (l *LaunchRoutes) linkAgentToProject(agentID string, meta map[string]interf
 
 	if role == "PM" && projectID != "" {
 		l.db.UpdateProject(projectID, map[string]interface{}{"pm_agent_id": agentID})
-		if pmPrompt, ok := meta["pm_prompt"].(string); ok && pmPrompt != "" {
-			l.db.AddMessage(agentID, pmPrompt, "user", nil)
-			slog.Info("Sent PM system prompt", "agentId", agentID)
+		// PM system instructions are set via buildAgentSystemPrompt in the agent CLI
+		// Only send the user's actual task as a message
+		userPrompt, _ := meta["user_prompt"].(string)
+		pmPrompt, _ := meta["pm_prompt"].(string)
+		// Combine: system instructions + user task as ONE message
+		// The agent CLI will use buildAgentSystemPrompt for the proper system prompt
+		combined := userPrompt
+		if combined == "" {
+			combined = pmPrompt // fallback if no user prompt
 		}
-		if userPrompt, ok := meta["user_prompt"].(string); ok && userPrompt != "" {
-			l.db.AddMessage(agentID, userPrompt, "user", nil)
-			slog.Info("Sent user initial prompt", "agentId", agentID)
+		if combined != "" {
+			l.db.AddMessage(agentID, combined, "user", nil)
+			slog.Info("Sent PM task", "agentId", agentID)
 		}
 	}
 

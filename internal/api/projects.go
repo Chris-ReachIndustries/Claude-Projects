@@ -1,17 +1,18 @@
 package api
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"net/http"
 	"sort"
+	"strings"
 	"strconv"
 	"time"
 
 	"claude-agent-manager/internal/db"
-
-	"crypto/rand"
+	"claude-agent-manager/internal/roles"
 )
 
 type ProjectRoutes struct {
@@ -27,7 +28,6 @@ func NewProjectRoutes(d *db.DB, sse *SSEBroker, spawner SpawnerNotifier) *Projec
 func generatePMPrompt(project map[string]interface{}) string {
 	name, _ := project["name"].(string)
 	desc, _ := project["description"].(string)
-	id, _ := project["id"].(string)
 	maxC, _ := project["max_concurrent"].(int64)
 	if maxC == 0 {
 		maxC = 4
@@ -36,56 +36,73 @@ func generatePMPrompt(project map[string]interface{}) string {
 		desc = "(no description)"
 	}
 
-	return fmt.Sprintf(`You are a Project Manager agent for: "%s"
+	return fmt.Sprintf(`You are the lead strategist managing project: "%s"
 
-Description: %s
+You have a team of %d specialist agents you can spawn, talk to, and direct. You decide
+what needs to happen, who to assign, and what to do with their findings.
 
-## YOUR ROLE — MANAGEMENT ONLY
+## Tools
+- spawn_agent: Create a specialist (give them ONE task, ONE output file, and context)
+- relay_message: Talk to an agent (use wait_for_reply=true for back-and-forth conversation)
+- read_file: Read files — always read agent output before deciding next steps
+- close_agent: Shut down an agent when done with them — YOU must do this, agents cannot close themselves
+- post_update: Share your thinking and decisions on the project timeline
+- scratchpad_write/scratchpad_read: Shared notes all agents can see
+- list_project_agents: See who's working and their status
+- list_files: Check what files exist in the workspace
 
-You are STRICTLY a manager. You do NOT write code, run builds, edit files, or do
-any implementation work yourself. Your ONLY job is to:
-- Plan and break down the project into tasks
-- Spawn and coordinate sub-agents who do the actual work
-- Monitor sub-agent progress and coordinate handoffs
-- Report status to the user via project timeline updates
-- Make decisions about priorities, sequencing, and resource allocation
+## Container images for agents
+Choose the right image for the task. Set via: spawn_agent(role="...", prompt="...", image="claude-agent-xxx")
 
-If a task needs doing, spawn a sub-agent for it. NEVER do it yourself.
+- **claude-agent** (default, 49MB) — bash, curl, git, jq. For research, writing, planning, analysis.
+- **claude-agent-dev** (400MB) — Python 3 + Node.js. For coding, scripting, development.
+- **claude-agent-go** (300MB) — Go 1.24 + build tools. For Go development and compilation.
+- **claude-agent-data** (600MB) — Python + pandas, numpy, scipy, matplotlib, scikit-learn. For data analysis, charts, CSV processing.
+- **claude-agent-doc-reader** (400MB) — Python + pdfplumber, python-docx, openpyxl. For reading PDFs, Word docs, Excel files.
+- **claude-agent-web** (500MB) — Node.js + Playwright + Chromium. For web scraping, automated testing, screenshots.
+- **claude-agent-printingpress** (530MB) — Python + WeasyPrint + PrintingPress PDF system. For professional branded PDF reports. The agent should create a Python script that imports from /opt/printingpress/build.py and calls build_document(title, subtitle, brand, content_html, output_name, output_dir). Brand options: reach, lumi. HTML classes: h1, h2, h3, p, ul, table.
 
-## CAPABILITIES
+## Agent lifecycle — YOU control this
+1. Spawn agent with ONE task → they work and message you when done
+2. Read their output file (read_file) → evaluate the quality
+3. Message them back (relay_message with wait_for_reply=true) → ask questions, give feedback
+4. Have 2-3 exchanges → challenge weak parts, ask for specifics
+5. Either give them more work OR close_agent → free the slot for the next agent
+6. NEVER leave agents idle — if they've reported back and you're satisfied, close them immediately
 
-SPAWN SUB-AGENT:
-  POST /api/projects/%s/spawn-agent
-  Body: { "role": "descriptive role name", "prompt": "detailed task description..." }
-  Max %d concurrent agents. Suspend completed ones to free slots.
-  Default image: claude-agent (Go-based, 49MB, includes bash/curl/git/jq)
+## What makes you effective
+- Read every agent's output and react to it — let findings shape your next move
+- Have real conversations with agents — ask follow-ups, challenge weak work, request rewrites
+- Post your decisions and reasoning to the timeline so the user can follow along
+- Make hard calls — focus beats coverage
+- Quality over quantity — fewer excellent deliverables beats many generic ones
+- After each agent closes, check list_project_agents — if agents are idle, close them or give them work
 
-MESSAGE SUB-AGENT:
-  POST /api/agents/{your_agent_id}/relay
-  Body: { "target_agent_id": "{sub_agent_id}", "content": "..." }
+## Retry limits
+- If an agent fails a task, you may retry ONCE with adjusted instructions
+- If it fails a second time, STOP and post an error to the timeline explaining what went wrong
+- NEVER spawn more than 3 agents for the same task — if 3 attempts fail, move on or ask the user
+- Track your attempts via scratchpad so you don't lose count across turns
 
-VIEW SUB-AGENT OUTPUT:
-  GET /api/agents/{sub_agent_id}/updates
+## Completing the project
+When all work is done:
+1. Use list_files to verify all deliverables exist
+2. Read the key output files to confirm quality
+3. Post a final summary to the timeline listing all deliverables and key decisions made
+4. If a final compilation document was requested, spawn one last agent to write it — review and approve before closing
 
-UPDATE PROJECT STATUS:
-  POST /api/projects/%s/updates
-  Body: { "type": "milestone|decision|info", "content": "..." }
+You have access to a library of 162 specialist agent roles. Use the search_roles tool to find the right specialist for any task.`, name, maxC)
+}
 
-SUSPEND SUB-AGENT:
-  POST /api/agents/{sub_agent_id}/close
-
-RESUME SUB-AGENT:
-  POST /api/agents/{sub_agent_id}/resume
-
-## WORKFLOW
-1. Analyze the project goal and break it into phases/tasks
-2. Spawn specialized sub-agents for each task
-3. Monitor their progress actively
-4. Report milestones and decisions to the user
-5. When a sub-agent finishes, verify the work, then SUSPEND it
-6. When all phases complete, post a final summary
-
-Begin by analyzing the task and creating your execution plan.`, name, desc, id, maxC, id)
+func generatePMAutonomyNote(project map[string]interface{}) string {
+	mode, _ := project["autonomy_mode"].(string)
+	if mode == "" {
+		mode = "autonomous"
+	}
+	if mode == "autonomous" {
+		return "\n\n## MODE: AUTONOMOUS\nDo NOT ask for user approval. Execute your plan immediately. Make all decisions independently. The user will monitor via the dashboard but does not want to be interrupted."
+	}
+	return "\n\n## MODE: SUPERVISED\nUse ask_user before major decisions (spawning agents, changing plans). Wait for user approval on your execution plan before proceeding."
 }
 
 func (p *ProjectRoutes) List(w http.ResponseWriter, r *http.Request) {
@@ -108,10 +125,60 @@ func (p *ProjectRoutes) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := generateUUID()
+
+	// Auto-generate folder path if not provided — every project gets its own isolated folder
+	if body.FolderPath == "" {
+		// Create a slug from the project name
+		slug := strings.ToLower(body.Name)
+		slug = strings.Map(func(r rune) rune {
+			if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
+				return r
+			}
+			if r == ' ' || r == '-' || r == '_' {
+				return '-'
+			}
+			return -1
+		}, slug)
+		// Trim multiple dashes and trailing dashes
+		for strings.Contains(slug, "--") {
+			slug = strings.ReplaceAll(slug, "--", "-")
+		}
+		slug = strings.Trim(slug, "-")
+		if slug == "" {
+			slug = id[:8]
+		}
+		body.FolderPath = slug
+	}
+
 	p.db.CreateProject(id, body.Name, body.Description, body.FolderPath, body.MaxConcurrent)
 	project := p.db.GetProject(id)
 	p.sse.Broadcast("project-created", project)
 	writeJSON(w, http.StatusCreated, project)
+}
+
+func (p *ProjectRoutes) Update(w http.ResponseWriter, r *http.Request) {
+	id := pathParam(r, "id")
+	if p.db.GetProject(id) == nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "Project not found"})
+		return
+	}
+	var body map[string]interface{}
+	if err := readJSON(r, &body); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
+		return
+	}
+	// Only allow safe fields to be updated
+	allowed := map[string]bool{"name": true, "description": true, "folder_path": true, "max_concurrent": true, "autonomy_mode": true, "pm_agent_id": true}
+	fields := map[string]interface{}{}
+	for k, v := range body {
+		if allowed[k] {
+			fields[k] = v
+		}
+	}
+	if len(fields) > 0 {
+		p.db.UpdateProject(id, fields)
+	}
+	writeJSON(w, http.StatusOK, p.db.GetProject(id))
 }
 
 func (p *ProjectRoutes) Get(w http.ResponseWriter, r *http.Request) {
@@ -189,61 +256,55 @@ func (p *ProjectRoutes) Start(w http.ResponseWriter, r *http.Request) {
 	pmAgentID, _ := project["pm_agent_id"].(string)
 	resumed := false
 
-	// Resume if paused with existing PM
-	if pmAgentID != "" && status == "paused" {
+	// If project already has a PM, always resume it — never create a duplicate.
+	if pmAgentID != "" && (status == "paused" || status == "active") {
 		pmAgent := p.db.GetAgent(pmAgentID)
 		if pmAgent != nil {
-			pmStatus, _ := pmAgent["status"].(string)
-			if pmStatus == "archived" || pmStatus == "completed" {
-				pmCwd, _ := pmAgent["cwd"].(string)
-				if pmCwd == "" {
-					pmCwd = folderPath
-				}
-				p.db.CreateLaunchRequest("resume", pmCwd, &pmAgentID, nil)
-				p.db.UpdateAgent(pmAgentID, map[string]interface{}{"status": "active"})
-				p.db.AddProjectUpdate(id, "info", "Project resumed. PM agent being restarted.")
+			// Always use project folder_path for resume — agent CWD is container-internal (/workspace)
+			p.db.UpdateAgent(pmAgentID, map[string]interface{}{"status": "archived"})
+			lr := p.db.CreateLaunchRequest("resume", folderPath, &pmAgentID, nil)
+			lrID, _ := lr["id"].(int64)
+			p.db.UpdateAgent(pmAgentID, map[string]interface{}{"status": "active"})
+			p.db.AddProjectUpdate(id, "info", "Project resumed. PM agent being restarted.")
 
-				if body.InitialPrompt != "" {
-					p.db.AddMessage(pmAgentID, body.InitialPrompt, "user", nil)
-				}
-
-				// Resume archived sub-agents
-				subAgents := p.db.GetProjectAgents(id)
-				resumedCount := 0
-				for _, sa := range subAgents {
-					saID, _ := sa["id"].(string)
-					saStatus, _ := sa["status"].(string)
-					if saID != pmAgentID && saStatus == "archived" {
-						saCwd, _ := sa["cwd"].(string)
-						if saCwd == "" {
-							saCwd = folderPath
-						}
-						p.db.CreateLaunchRequest("resume", saCwd, &saID, nil)
-						p.db.UpdateAgent(saID, map[string]interface{}{"status": "active"})
-						resumedCount++
-					}
-				}
-				if resumedCount > 0 {
-					p.db.AddProjectUpdate(id, "info", fmt.Sprintf("Resuming %d sub-agent(s).", resumedCount))
-				}
-				resumed = true
+			// Notify spawner to process immediately
+			if p.spawner != nil {
+				p.spawner.Notify(lrID)
 			}
+
+			if body.InitialPrompt != "" {
+				p.db.AddMessage(pmAgentID, body.InitialPrompt, "user", nil)
+			}
+
+			// Do NOT resume archived sub-agents — the PM will spawn new ones as needed.
+			resumed = true
 		}
 	}
 
 	// First start — create new PM agent
 	if !resumed {
-		pmPrompt := generatePMPrompt(project)
+		pmPrompt := generatePMPrompt(project) + generatePMAutonomyNote(project)
 		lr := p.db.CreateLaunchRequest("new", folderPath, nil, nil)
 		lrID, _ := lr["id"].(int64)
 
 		p.db.AddProjectUpdate(id, "info", fmt.Sprintf("Project started. PM agent launch request created (ID: %d).", lrID))
 
+		// User prompt = project description + any additional initial prompt
+		desc, _ := project["description"].(string)
+		userPrompt := desc
+		if body.InitialPrompt != "" {
+			if userPrompt != "" {
+				userPrompt += "\n\n" + body.InitialPrompt
+			} else {
+				userPrompt = body.InitialPrompt
+			}
+		}
+
 		meta, _ := json.Marshal(map[string]interface{}{
 			"project_id":  id,
 			"role":        "PM",
 			"pm_prompt":   pmPrompt,
-			"user_prompt": body.InitialPrompt,
+			"user_prompt": userPrompt,
 		})
 		p.db.Exec("UPDATE launch_requests SET agent_id = ? WHERE id = ?", string(meta), lrID)
 
@@ -270,8 +331,13 @@ func (p *ProjectRoutes) Pause(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	p.db.UpdateProject(id, map[string]interface{}{"status": "paused"})
-	p.db.AddProjectUpdate(id, "info", "Project paused.")
+	// Archive all active agents — they'll be restarted on resume
+	p.db.Exec("UPDATE agents SET status = 'archived' WHERE project_id = ? AND status IN ('active','working','idle','waiting-for-input')", id)
+	p.db.AddProjectUpdate(id, "info", "Project paused. All agents archived.")
 	p.sse.Broadcast("project-updated", p.db.GetProject(id))
+	for _, agent := range p.db.GetProjectAgents(id) {
+		p.sse.Broadcast("agent-updated", agent)
+	}
 	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
 }
 
@@ -353,6 +419,7 @@ func (p *ProjectRoutes) SpawnAgent(w http.ResponseWriter, r *http.Request) {
 
 	var body struct {
 		Role       string `json:"role"`
+		RoleID     string `json:"role_id"`
 		Prompt     string `json:"prompt"`
 		FolderPath string `json:"folder_path"`
 		Image      string `json:"image"`
@@ -379,19 +446,39 @@ func (p *ProjectRoutes) SpawnAgent(w http.ResponseWriter, r *http.Request) {
 		folderPath, _ = project["folder_path"].(string)
 	}
 
+	// Look up role from library if role_id provided
+	var roleSystemPrompt string
+	image := body.Image
+	if body.RoleID != "" {
+		if role := roles.Get(body.RoleID); role != nil {
+			roleSystemPrompt = role.SystemPrompt
+			// Use role's suggested image if none specified
+			if image == "" {
+				image = role.SuggestedImage
+			}
+		}
+	}
+
 	lr := p.db.CreateLaunchRequest("new", folderPath, nil, nil)
 	lrID, _ := lr["id"].(int64)
 
 	// Set image if specified
-	if body.Image != "" {
-		p.db.Exec("UPDATE launch_requests SET image = ? WHERE id = ?", body.Image, lrID)
+	if image != "" {
+		p.db.Exec("UPDATE launch_requests SET image = ? WHERE id = ?", image, lrID)
 	}
 
 	pmAgentID, _ := project["pm_agent_id"].(string)
-	meta, _ := json.Marshal(map[string]interface{}{
+	meta := map[string]interface{}{
 		"project_id": id, "role": body.Role, "prompt": body.Prompt, "parent_agent_id": pmAgentID,
-	})
-	p.db.Exec("UPDATE launch_requests SET agent_id = ? WHERE id = ?", string(meta), lrID)
+	}
+	if body.RoleID != "" {
+		meta["role_id"] = body.RoleID
+	}
+	if roleSystemPrompt != "" {
+		meta["role_system_prompt"] = roleSystemPrompt
+	}
+	metaJSON, _ := json.Marshal(meta)
+	p.db.Exec("UPDATE launch_requests SET agent_id = ? WHERE id = ?", string(metaJSON), lrID)
 
 	p.db.AddProjectUpdate(id, "info", fmt.Sprintf("Sub-agent spawn requested: %s (launch request ID: %d)", body.Role, lrID))
 	p.sse.Broadcast("launch-request-created", map[string]interface{}{"id": lrID, "type": "new", "folder_path": folderPath, "status": "pending"})
